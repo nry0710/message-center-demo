@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # DigiFinex 消息中心演示 | Message Center Demo
 
 ## 🚀 演示網址
@@ -40,3 +41,7 @@
 
 ---
 *© 2024 DigiFinex Message Center Demo* 
+=======
+# message-center-demo
+DigiFinex Message Center Demo - 消息中心演示
+>>>>>>> a37bed3646d374a6d3eb3580947f77c3a8da7958
