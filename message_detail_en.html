@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5e72e4;
+            --primary-light: #7f8ff4;
+            --primary-dark: #324cdd;
+            --secondary-color: #f7fafc;
+            --text-primary: #32325d;
+            --text-secondary: #525f7f;
+            --text-tertiary: #8898aa;
+            --background-color: #f8f9fe;
+            --border-color: #e9ecef;
+            --category-system: #5e72e4;
+            --category-trade: #2dce89;
+            --category-security: #fb6340;
+            --category-activity: #ff9800;
+            --category-market: #2196f3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .share-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        .message-detail {
+            padding: 20px;
+        }
+        
+        .message-category {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .category-system {
+            background-color: var(--category-system);
+        }
+        
+        .category-trade {
+            background-color: var(--category-trade);
+        }
+        
+        .category-security {
+            background-color: var(--category-security);
+        }
+        
+        .category-activity {
+            background-color: var(--category-activity);
+        }
+        
+        .category-market {
+            background-color: var(--category-market);
+        }
+        
+        .message-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .message-meta {
+            display: flex;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 20px;
+        }
+        
+        .message-time {
+            margin-right: 15px;
+        }
+        
+        .message-content {
+            margin-bottom: 30px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .message-content p {
+            margin-bottom: 15px;
+        }
+        
+        .message-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Icon styles */
+        .system-icon {
+            background-color: rgba(94, 114, 228, 0.1);
+            color: var(--category-system);
+        }
+        
+        .trade-icon {
+            background-color: rgba(45, 206, 137, 0.1);
+            color: var(--category-trade);
+        }
+        
+        .security-icon {
+            background-color: rgba(251, 99, 64, 0.1);
+            color: var(--category-security);
+        }
+        
+        .activity-icon {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--category-activity);
+        }
+        
+        .market-icon {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--category-market);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Navigation -->
+        <div class="header">
+            <button class="back-btn" id="backBtn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Message Details</div>
+            <button class="share-btn">
+                <i class="fa-solid fa-share-nodes"></i>
+            </button>
+        </div>
+        
+        <!-- Message Detail Content -->
+        <div class="message-detail">
+            <div class="message-category category-system" id="messageCategory">System Notification</div>
+            <h1 class="message-title" id="messageTitle">System Maintenance Notice</h1>
+            <div class="message-meta">
+                <span class="message-time" id="messageTime">2025-04-23 15:30:00</span>
+                <span class="message-id" id="messageId">ID: system-1</span>
+            </div>
+            <div class="message-content" id="messageContent">
+                <p>Dear User:</p>
+                <p>DigiFinex will perform system upgrade maintenance from 2:00-4:00 AM on April 25, 2025. All services will be suspended during this period. Please arrange your assets in advance. Thank you for your understanding and support.</p>
+                <p>Services suspended during maintenance include:</p>
+                <p>1. All cryptocurrency deposits and withdrawals<br>
+                2. Spot trading<br>
+                3. Contract trading<br>
+                4. API services<br>
+                5. Leverage lending services</p>
+                <p>During maintenance, asset security will not be affected. Please do not worry.</p>
+                <p>If you have any questions, please contact our customer service team at any time.</p>
+                <p>DigiFinex Team<br>
+                April 23, 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get URL parameters
+            function getUrlParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+            
+            // Back button - return to message center
+            document.getElementById('backBtn').addEventListener('click', function() {
+                window.location.href = 'message_center_app_prototype_en.html';
+            });
+            
+            // Get message ID and type
+            const messageId = getUrlParam('id') || 'system-001';
+            const messageType = getUrlParam('type') || 'system';
+            
+            // Load message content based on ID and type
+            loadMessageDetails(messageId, messageType);
+            
+            // Load message details
+            function loadMessageDetails(id, type) {
+                console.log(`Loading message details: ID=${id}, Type=${type}`);
+                
+                // Set title
+                document.querySelector('.header-title').textContent = 'Message Details';
+                
+                // Update message category
+                const messageCategory = document.getElementById('messageCategory');
+                messageCategory.className = 'message-category';
+                
+                switch(type) {
+                    case 'system':
+                        messageCategory.classList.add('category-system');
+                        messageCategory.textContent = 'System Notification';
+                        break;
+                    case 'trade':
+                        messageCategory.classList.add('category-trade');
+                        messageCategory.textContent = 'Trading Related';
+                        break;
+                    case 'security':
+                        messageCategory.classList.add('category-security');
+                        messageCategory.textContent = 'Security Alert';
+                        break;
+                    case 'activity':
+                        messageCategory.classList.add('category-activity');
+                        messageCategory.textContent = 'Activity Announcement';
+                        break;
+                    case 'market':
+                        messageCategory.classList.add('category-market');
+                        messageCategory.textContent = 'Market Update';
+                        break;
+                }
+                
+                // Update message ID
+                document.getElementById('messageId').textContent = `ID: ${id}`;
+                
+                // Get message type and number
+                const typePrefix = type.charAt(0).toUpperCase() + type.slice(1);
+                const idNumber = id.split('-')[1];
+                
+                // Set detail content based on ID type
+                let title = '';
+                let time = '2025-04-23 15:30:00';
+                let content = '';
+                
+                // Match ID and type to set corresponding message content
+                if (type === 'system') {
+                    switch(idNumber) {
+                        case '001':
+                            title = 'System Maintenance Notice';
+                            content = `<p>Dear User:</p>
+                            <p>DigiFinex will perform system upgrade maintenance from 2:00-4:00 AM on April 25, 2025. All services will be suspended during this period. Please arrange your assets in advance. Thank you for your understanding and support.</p>
+                            <p>Services suspended during maintenance include:</p>
+                            <p>1. All cryptocurrency deposits and withdrawals<br>
+                            2. Spot trading<br>
+                            3. Contract trading<br>
+                            4. API services<br>
+                            5. Leverage lending services</p>
+                            <p>During maintenance, asset security will not be affected. Please do not worry.</p>
+                            <p>If you have any questions, please contact our customer service team at any time.</p>
+                            <p>DigiFinex Team<br>
+                            April 23, 2025</p>`;
+                            break;
+                        case '002':
+                            title = 'System Update Notification';
+                            time = '2025-04-20 09:30:15';
+                            content = `<p>Dear User:</p>
+                            <p>DigiFinex platform has completed system updates. The new trading interface is now live! The new version brings the following optimizations:</p>
+                            <p>1. New K-line charts with support for more technical indicators<br>
+                            2. Optimized order management interface for more intuitive order execution<br>
+                            3. New one-click order feature for quick market opportunity capture<br>
+                            4. Optimized depth chart display for clear market trends<br>
+                            5. New price alert feature for instant important price notifications</p>
+                            <p>Experience the new trading interface now and enjoy a smoother trading experience!</p>
+                            <p><a href="#">View Details</a></p>`;
+                            break;
+                        default:
+                            title = 'System Notification';
+                            content = `<p>Dear User:</p><p>This is a system notification with ID ${id}.</p>`;
+                    }
+                } else if (type === 'trade') {
+                    switch(idNumber) {
+                        case '001':
+                            title = 'Order Execution Notice';
+                            time = '2025-04-20 09:15:42';
+                            content = `<p>Dear User:</p>
+                            <p>Your order has been successfully executed.</p>
+                            <p>Trading Pair: BTC/USDT<br>
+                            Order Type: Limit Buy<br>
+                            Price: 68,500.00 USDT<br>
+                            Quantity: 0.15000000 BTC<br>
+                            Total: 10,275.00 USDT<br>
+                            Fee: 10.28 USDT<br>
+                            Execution Time: 2025-04-20 09:15:42</p>
+                            <p><a href="#">View Order Details</a></p>`;
+                            break;
+                        default:
+                            title = 'Trading Related Notification';
+                            content = `<p>Dear User:</p><p>This is a trading related notification with ID ${id}.</p>`;
+                    }
+                } else if (type === 'security') {
+                    switch(idNumber) {
+                        case '001':
+                            title = 'Login Security Alert';
+                            time = '2025-04-20 07:20:05';
+                            content = `<p>Dear User:</p>
+                            <p>We detected unusual login attempts on your account.</p>
+                            <p>Time: 2025-04-20 07:18:42<br>
+                            IP Address: 185.73.XX.XX<br>
+                            Location: Ukraine<br>
+                            Device: Unknown Device<br>
+                            Status: Blocked</p>
+                            <p>If this was not your action, we recommend immediately:<br>
+                            1. Change your login password<br>
+                            2. Enable or reset two-factor authentication<br>
+                            3. Check API key permissions</p>
+                            <p>To protect your asset security, we recommend regularly updating passwords and using strong password strategies.</p>
+                            <p><a href="#">Change Password Now</a></p>`;
+                            break;
+                        default:
+                            title = 'Security Alert';
+                            content = `<p>Dear User:</p><p>This is a security alert with ID ${id}.</p>`;
+                    }
+                } else if (type === 'activity') {
+                    switch(idNumber) {
+                        case '001':
+                            title = 'New Token Listing Announcement';
+                            time = '2025-04-19 18:30:00';
+                            content = `<p>Dear User:</p>
+                            <p>DigiFinex will soon list SEI (Seinetwork) token! As a Layer 1 blockchain, SEI is dedicated to providing high-performance, low-latency infrastructure for DeFi applications.</p>
+                            <p>Listing Details:<br>
+                            - Deposit Open: April 22, 2025 12:00 (UTC+8)<br>
+                            - Trading Open: April 23, 2025 12:00 (UTC+8)<br>
+                            - Trading Pairs: SEI/USDT, SEI/BTC</p>
+                            <p>Participate in activities to share 100,000 USDT:<br>
+                            1. Deposit Rewards: Deposit SEI to receive platform token airdrops<br>
+                            2. Trading Mining: Trading volume ranking rewards<br>
+                            3. Hold-to-Earn: Hold SEI to participate in ecosystem project token airdrops</p>
+                            <p>Act now and seize the early investment opportunity in SEI!</p>
+                            <p><a href="#">Join Activity</a></p>`;
+                            break;
+                        default:
+                            title = 'Activity Announcement';
+                            content = `<p>Dear User:</p><p>This is an activity announcement with ID ${id}.</p>`;
+                    }
+                } else if (type === 'market') {
+                    switch(idNumber) {
+                        case '001':
+                            title = 'Market Movement Alert';
+                            time = '2025-04-15 23:45:10';
+                            content = `<p>Dear User:</p>
+                            <p>Bitcoin (BTC) price has surged dramatically in the past 24 hours, breaking through the 75,000 USD barrier to reach a new all-time high. This price breakthrough is mainly driven by the following factors:</p>
+                            <p>1. Institutional investors significantly increased holdings<br>
+                            2. Federal Reserve rate cut expectations strengthened<br>
+                            3. Mainstream banks launched cryptocurrency custody services<br>
+                            4. Bitcoin ETF funds continued to flow in</p>
+                            <p>Technical Analysis:<br>
+                            - All major moving averages show strong buy signals<br>
+                            - RSI at 78, entering overbought zone but still has upward momentum<br>
+                            - Trading volume 205% higher than 30-day average</p>
+                            <p>Market Forecast:<br>
+                            Analysts generally expect BTC to test the 80,000 USD level in the short term, but also warn of possible corrections. We recommend staying alert and trading cautiously.</p>
+                            <p><a href="#">View BTC Market</a></p>`;
+                            break;
+                        default:
+                            title = 'Market Update Notification';
+                            content = `<p>Dear User:</p><p>This is a market update notification with ID ${id}.</p>`;
+                    }
+                }
+                
+                // Update message title and time
+                document.getElementById('messageTitle').textContent = title;
+                document.getElementById('messageTime').textContent = time;
+                
+                // Update message content
+                document.getElementById('messageContent').innerHTML = content;
+            }
+        });
+    </script>
+</body>
+</html> 

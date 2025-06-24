@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DigiFinex Message Center - APP Version</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: #673ab7;
+            --primary-light: rgba(103, 58, 183, 0.1);
+            --secondary-color: #ff5722;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #eee;
+            --category-system: #3f51b5;
+            --category-trade: #4caf50;
+            --category-security: #f44336;
+            --category-activity: #ff9800;
+            --category-market: #2196f3;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 2px 6px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        
+        body {
+            background-color: #f4f5f9;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .icon-btn:active {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        /* Search bar */
+        .search-bar {
+            background-color: var(--card-bg);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 53px;
+            z-index: 99;
+            display: none;
+        }
+        
+        .search-bar.show {
+            display: block;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 16px;
+            position: relative;
+            flex: 1;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 16px;
+            padding: 4px 0;
+            color: var(--text-primary);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        .search-icon {
+            color: var(--text-tertiary);
+            margin-right: 8px;
+            font-size: 14px;
+        }
+        
+        .search-clear {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: none;
+            margin-left: 8px;
+        }
+        
+        .search-clear.show {
+            display: block;
+        }
+        
+        .search-clear:active {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .search-cancel {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px 12px;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+        
+        .search-cancel:active {
+            background-color: var(--primary-light);
+            border-radius: 4px;
+        }
+        
+        /* Category tabs */
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            position: sticky;
+            top: 53px;
+            z-index: 90;
+            scrollbar-width: none;
+            transition: top 0.3s ease;
+        }
+        
+        .category-tabs.search-active {
+            top: 106px;
+        }
+        
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-tab {
+            padding: 12px 16px;
+            white-space: nowrap;
+            font-size: 14px;
+            color: var(--text-secondary);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .category-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .category-tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .badge {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 10px;
+            padding: 0 6px;
+            font-size: 12px;
+            margin-left: 4px;
+            min-width: 16px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        /* Message list container */
+        .message-list-container {
+            padding: 8px 0;
+            min-height: calc(100vh - 160px);
+        }
+        
+        /* Date divider */
+        .date-divider {
+            padding: 10px 16px;
+            background-color: #f9f9fc;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Message item */
+        .message-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        
+        .message-item:active {
+            background-color: #f7f7f7;
+        }
+        
+        .message-item.unread:before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+        
+        .message-icon {
+            margin-right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e6f7ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            font-size: 18px;
+        }
+        
+        .system-message .message-icon {
+            background-color: rgba(63, 81, 181, 0.1);
+            color: var(--category-system);
+        }
+        
+        .trade-message .message-icon {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--category-trade);
+        }
+        
+        .security-message .message-icon {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--category-security);
+        }
+        
+        .activity-message .message-icon {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--category-activity);
+        }
+        
+        .market-message .message-icon {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--category-market);
+        }
+        
+        .message-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .message-title-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .message-title {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+        
+        .message-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+        }
+        
+        .message-item.unread .message-title,
+        .message-item.unread .message-preview {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            color: var(--text-secondary);
+            width: 20%;
+            font-size: 12px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        
+        /* Bottom safe area */
+        .safe-area-bottom {
+            height: 65px;
+        }
+        
+        /* Pull refresh indicator */
+        .pull-refresh-hint {
+            text-align: center;
+            padding: 10px;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        /* Load more indicator */
+        .load-more {
+            text-align: center;
+            padding: 16px;
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-subtext {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <i class="fa-regular fa-bell"></i>
+                Message Center
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="search-btn">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <button class="icon-btn" id="mark-all-read">
+                    <i class="fa-solid fa-check-double"></i>
+                </button>
+                <button class="icon-btn" id="settings-btn">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search bar -->
+        <div class="search-bar" id="searchBar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search messages...">
+                    <button class="search-clear" id="searchClear">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <button class="search-cancel" id="searchCancel">Cancel</button>
+            </div>
+        </div>
+        
+        <!-- Category tabs -->
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">
+                All
+                <span class="badge">50</span>
+            </div>
+            <div class="category-tab" data-category="system">
+                System
+                <span class="badge">10</span>
+            </div>
+            <div class="category-tab" data-category="trade">
+                Trading
+                <span class="badge">10</span>
+            </div>
+            <div class="category-tab" data-category="security">
+                Security
+                <span class="badge">10</span>
+            </div>
+            <div class="category-tab" data-category="activity">
+                Activities
+                <span class="badge">10</span>
+            </div>
+            <div class="category-tab" data-category="market">
+                Market
+                <span class="badge">10</span>
+            </div>
+        </div>
+        
+        <!-- Message list container -->
+        <div class="message-list-container" id="messageList">
+            <div class="pull-refresh-hint">
+                <i class="fa-solid fa-arrow-down"></i>
+                Pull to refresh
+            </div>
+            
+            <div class="date-divider">
+                <i class="fa-regular fa-calendar"></i>
+                Today
+            </div>
+            
+            <!-- System notification type messages - 10 items -->
+            <div class="message-item unread system-message" data-type="system" data-id="system-001">
+                <div class="message-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">System Maintenance Notice</div>
+                        <div class="message-time">15:30</div>
+                    </div>
+                    <div class="message-preview">Dear User: DigiFinex will perform system upgrade maintenance from 2:00-4:00 AM on April 25, 2025. All services will be suspended during this period. Please arrange your assets in advance. Thank you for your understanding and support.</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread system-message" data-type="system" data-id="system-002">
+                <div class="message-icon">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">System Update Notification</div>
+                        <div class="message-time">09:30</div>
+                    </div>
+                    <div class="message-preview">DigiFinex platform has completed system updates. The new trading interface is now live! The new version brings smoother trading experience and richer technical analysis tools.</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread system-message" data-type="system" data-id="system-003">
+                <div class="message-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Deposit Confirmation</div>
+                        <div class="message-time">09:28</div>
+                    </div>
+                    <div class="message-preview">USDT deposit successful, amount: 5,000 USDT, network: TRC20, status: confirmed, transaction ID: TRx7a2Z9bK4L5p8M3nQwR6sTuVy1X0zY</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-004">
+                <div class="message-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Withdrawal Success</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">ETH withdrawal successful, amount: 1.5 ETH, withdrawal address: 0x7D8c5F8a3b2E9B7E6a4BcA1F6a682E71EC98F72B, transaction hash: 0x9b3a7fb2e8c4d5f6a7e1b0d2c3a4f5e6d7c8b9a0</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-005">
+                <div class="message-icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Airdrop Received</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Congratulations! You have received 200 GRT token airdrop, value approximately: 260 USDT, reason: holding related NFT qualification proof</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-006">
+                <div class="message-icon">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Fee Rebate</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Based on your VIP level and trading volume, the system has rebated your trading fees from last week: 45.68 USDT. Thank you for your support of DigiFinex!</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-007">
+                <div class="message-icon">
+                    <i class="fa-solid fa-certificate"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Staking Rewards Distributed</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">Your Solana (SOL) staking rewards have been distributed to your account: 0.32054795 SOL, reward period: April 10, 2025 to April 16, 2025</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-008">
+                <div class="message-icon">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Investment Product Matured</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">Your USDT fixed income investment product has matured. Subscription amount: 10,000.00 USDT, actual returns: 328.77 USDT. Principal and returns have been automatically deposited into your fund account</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-009">
+                <div class="message-icon">
+                    <i class="fa-solid fa-flag"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Platform Event Ended</div>
+                        <div class="message-time">April 20</div>
+                    </div>
+                    <div class="message-preview">The "Trading Competition" event you participated in has ended. You ranked 8th and received 1,000 USDT reward which has been deposited into your fund account</div>
+                </div>
+            </div>
+            
+            <div class="message-item system-message" data-type="system" data-id="system-010">
+                <div class="message-icon">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">New Feature Released</div>
+                        <div class="message-time">April 19</div>
+                    </div>
+                    <div class="message-preview">DigiFinex's new feature "Small Asset Conversion" is now live! You can convert small cryptocurrencies to platform tokens with one click, effectively organizing your assets</div>
+                </div>
+            </div>
+            
+            <div class="date-divider">
+                <i class="fa-regular fa-calendar"></i>
+                Yesterday
+            </div>
+            
+            <!-- Trading related type messages - 10 items -->
+            <div class="message-item unread trade-message" data-type="trade" data-id="trade-001">
+                <div class="message-icon">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Order Execution Notice</div>
+                        <div class="message-time">09:15</div>
+                    </div>
+                    <div class="message-preview">Your BTC/USDT limit buy order has been executed. Price: 68,500.00 USDT, quantity: 0.15000000 BTC, total: 10,275.00 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread trade-message" data-type="trade" data-id="trade-002">
+                <div class="message-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Order Placed Successfully</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Your ETH/USDT limit buy order has been successfully submitted. Price: 5,800.00 USDT, quantity: 3.00000000 ETH, total: 17,400.00 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread trade-message" data-type="trade" data-id="trade-003">
+                <div class="message-icon">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Take Profit Order Triggered</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Your take profit order has been successfully triggered and executed. Trading pair: ETH/USDT, trigger price: 6,200.00 USDT, actual execution price: 6,205.50 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-004">
+                <div class="message-icon">
+                    <i class="fa-solid fa-arrow-trend-down"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Stop Loss Order Triggered</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Your stop loss order has been triggered. Trading pair: SOL/USDT, trigger price: 120.00 USDT, actual execution price: 119.50 USDT, quantity: 25 SOL</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-005">
+                <div class="message-icon">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Leverage Trading Notification</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">You have successfully borrowed the following assets: Currency: USDT, borrowed amount: 20,000.00, annual interest rate: 7.3%, borrowed account: spot leverage account</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-006">
+                <div class="message-icon">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Funding Rate Notification</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">BTC/USDT perpetual contract funding rate will be charged in 3 hours. Current rate: 0.0185%, expected next rate: 0.0112%</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-007">
+                <div class="message-icon">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Price Alert</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">Your price alert has been triggered. Currency: BTC, current price: 70,250.00 USDT, alert condition: price above 70,000.00 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-008">
+                <div class="message-icon">
+                    <i class="fa-solid fa-grid-2"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Grid Trading Report</div>
+                        <div class="message-time">April 20</div>
+                    </div>
+                    <div class="message-preview">Your BTC/USDT grid trading bot has been running for 7 days. Completed trades: 48, cumulative returns: 358.65 USDT (2.39%), annualized return rate: ~124.7%</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-009">
+                <div class="message-icon">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Contract Liquidation Notice</div>
+                        <div class="message-time">April 19</div>
+                    </div>
+                    <div class="message-preview">Your SOL/USDT perpetual contract has been forcibly liquidated by the system due to insufficient maintenance margin. Position direction: Long, leverage: 20x, entry price: 125.00 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item trade-message" data-type="trade" data-id="trade-010">
+                <div class="message-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Leverage Adjustment Alert</div>
+                        <div class="message-time">April 18</div>
+                    </div>
+                    <div class="message-preview">Your ETH/USDT leverage position has a high risk rate, current price approaching liquidation price. Position size: 10.00000000 ETH, current risk rate: 87%</div>
+                </div>
+            </div>
+            
+            <div class="date-divider">
+                <i class="fa-regular fa-calendar"></i>
+                April 18
+            </div>
+            
+            <!-- Security alert type messages - 10 items -->
+            <div class="message-item unread security-message" data-type="security" data-id="security-001">
+                <div class="message-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Login Security Alert</div>
+                        <div class="message-time">07:20</div>
+                    </div>
+                    <div class="message-preview">We detected unusual login attempts on your account. Time: 2025-04-20 07:18:42, IP: 185.73.XX.XX, Location: Ukraine, Status: Blocked</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-002">
+                <div class="message-icon">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Password Update Reminder</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Your account password has not been updated for over 90 days. To protect your account security, we recommend regularly changing your login password. Last update: 2025-01-18</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread security-message" data-type="security" data-id="security-003">
+                <div class="message-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Fund Security Alert</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">We detected a large fund transfer operation on your account. Currency: BTC, amount: 2.50000000, equivalent value: 171,250.00 USDT</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-004">
+                <div class="message-icon">
+                    <i class="fa-solid fa-laptop"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">New Device Login</div>
+                        <div class="message-time">Yesterday</div>
+                    </div>
+                    <div class="message-preview">Detected login to your account from a new device. Device model: iPhone 16 Pro, OS: iOS 19.2, IP location: Taipei</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-005">
+                <div class="message-icon">
+                    <i class="fa-solid fa-face-viewfinder"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Identity Verification Upgrade</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">To further enhance your account security, we have launched facial recognition login. More secure than traditional passwords, prevents phishing website risks</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-006">
+                <div class="message-icon">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">KYC Verification Successful</div>
+                        <div class="message-time">Day before yesterday</div>
+                    </div>
+                    <div class="message-preview">Your identity verification has been successfully completed. You can now enjoy full trading features and increased withdrawal limits. Thank you for your cooperation!</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-007">
+                <div class="message-icon">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Security Tool Update</div>
+                        <div class="message-time">April 20</div>
+                    </div>
+                    <div class="message-preview">Google will launch an important update for Google Authenticator app on April 25, 2025. This update will optimize security but may require resetting two-factor authentication</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-008">
+                <div class="message-icon">
+                    <i class="fa-solid fa-phishing"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Phishing Website Warning</div>
+                        <div class="message-time">April 19</div>
+                    </div>
+                    <div class="message-preview">We recently discovered multiple phishing websites impersonating the official DigiFinex website. These websites aim to steal users' login credentials and assets</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-009">
+                <div class="message-icon">
+                    <i class="fa-solid fa-shield-virus"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">API Key Disabled</div>
+                        <div class="message-time">April 18</div>
+                    </div>
+                    <div class="message-preview">Due to security reasons, one of your API keys has been automatically disabled by the system. If this was not your action, please contact customer service immediately</div>
+                </div>
+            </div>
+            
+            <div class="message-item security-message" data-type="security" data-id="security-010">
+                <div class="message-icon">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Login IP Change</div>
+                        <div class="message-time">April 17</div>
+                    </div>
+                    <div class="message-preview">Your account detected login from different regions. Last login: Taipei, current login: Hong Kong, time difference: 4 hours</div>
+                </div>
+            </div>
+            
+            <div class="date-divider">
+                <i class="fa-regular fa-calendar"></i>
+                April 15
+            </div>
+            
+            <!-- Activity announcement type messages - 10 items -->
+            <div class="message-item unread activity-message" data-type="activity" data-id="activity-001">
+                <div class="message-icon">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">New Token Listing</div>
+                        <div class="message-time">18:30</div>
+                    </div>
+                    <div class="message-preview">DigiFinex will list SEI (Seinetwork) token soon! As a Layer 1 blockchain, SEI is dedicated to providing high-performance, low-latency infrastructure for DeFi applications</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread activity-message" data-type="activity" data-id="activity-002">
+                <div class="message-icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Trading Competition</div>
+                        <div class="message-time">16:00</div>
+                    </div>
+                    <div class="message-preview">BTC quarterly futures trading competition is now open! Trade BTC quarterly futures during the event period and win generous rewards</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-003">
+                <div class="message-icon">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Holiday Special Event</div>
+                        <div class="message-time">April 19</div>
+                    </div>
+                    <div class="message-preview">2025 Labor Day special event: Trade and win big prizes! Multiple promotions for 7 days, complete any trade to get lottery chances</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-004">
+                <div class="message-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Educational Event</div>
+                        <div class="message-time">April 18</div>
+                    </div>
+                    <div class="message-preview">Free cryptocurrency trading technical analysis course! Learn basic candlestick patterns, technical indicators, and trading strategies</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-005">
+                <div class="message-icon">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Platform Benefits</div>
+                        <div class="message-time">April 17</div>
+                    </div>
+                    <div class="message-preview">VIP users exclusive: Free exchange anniversary commemorative NFT! Limited edition of 1,000 pieces, designed by professional artists</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-006">
+                <div class="message-icon">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Feature Launch</div>
+                        <div class="message-time">April 16</div>
+                    </div>
+                    <div class="message-preview">New feature launched: One-click conversion of small assets to platform tokens. Support 50+ cryptocurrencies, zero-fee conversion</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-007">
+                <div class="message-icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Referral Program</div>
+                        <div class="message-time">April 15</div>
+                    </div>
+                    <div class="message-preview">Invite friends to join DigiFinex and earn rewards! Both inviter and invitee get 50 USDT bonus, plus 30% commission on trading fees</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-008">
+                <div class="message-icon">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Staking Event</div>
+                        <div class="message-time">April 14</div>
+                    </div>
+                    <div class="message-preview">New staking event launched! Stake ETH, SOL, or DOT to earn up to 15% APY. Flexible staking period, withdraw anytime</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-009">
+                <div class="message-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">NFT Marketplace</div>
+                        <div class="message-time">April 13</div>
+                    </div>
+                    <div class="message-preview">DigiFinex NFT marketplace is now live! Trade exclusive NFTs, participate in auctions, and earn rewards through NFT staking</div>
+                </div>
+            </div>
+            
+            <div class="message-item activity-message" data-type="activity" data-id="activity-010">
+                <div class="message-icon">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Gaming Event</div>
+                        <div class="message-time">April 12</div>
+                    </div>
+                    <div class="message-preview">Play-to-earn gaming event! Complete daily tasks, earn game tokens, and exchange for real cryptocurrency rewards</div>
+                </div>
+            </div>
+            
+            <div class="date-divider">
+                <i class="fa-regular fa-calendar"></i>
+                April 14
+            </div>
+            
+            <!-- Market update type messages - 10 items -->
+            <div class="message-item unread market-message" data-type="market" data-id="market-001">
+                <div class="message-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Market Movement Alert</div>
+                        <div class="message-time">23:45</div>
+                    </div>
+                    <div class="message-preview">Bitcoin (BTC) price has surged dramatically in the past 24 hours, breaking through the 75,000 USD barrier to reach a new all-time high.</div>
+                </div>
+            </div>
+            
+            <div class="message-item unread market-message" data-type="market" data-id="market-002">
+                <div class="message-icon">
+                    <i class="fa-brands fa-ethereum"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Token Focus</div>
+                        <div class="message-time">18:22</div>
+                    </div>
+                    <div class="message-preview">Ethereum (ETH) completed 2.0 final stage upgrade, significantly improving TPS and reducing Gas fees, price surged 15% briefly.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-003">
+                <div class="message-icon">
+                    <i class="fa-solid fa-gavel"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Regulatory Updates</div>
+                        <div class="message-time">April 15</div>
+                    </div>
+                    <div class="message-preview">Singapore Monetary Authority (MAS) today released new cryptocurrency regulatory framework, significantly relaxing restrictions on exchanges and service providers.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-004">
+                <div class="message-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Technical Analysis</div>
+                        <div class="message-time">April 14</div>
+                    </div>
+                    <div class="message-preview">SOL breaks through key resistance level, short-term target 200 USD. Broke through long-term downtrend line, forming new upward channel.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-005">
+                <div class="message-icon">
+                    <i class="fa-solid fa-newspaper"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Industry News</div>
+                        <div class="message-time">April 14</div>
+                    </div>
+                    <div class="message-preview">World's largest asset management company to launch cryptocurrency investment products, fund size expected to exceed 10 billion USD.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-006">
+                <div class="message-icon">
+                    <i class="fa-solid fa-code-branch"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">DeFi Dynamics</div>
+                        <div class="message-time">April 14</div>
+                    </div>
+                    <div class="message-preview">Decentralized Finance (DeFi) market reaches major milestone, lending protocol total locked value (TVL) first breaks 100 billion USD.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-007">
+                <div class="message-icon">
+                    <i class="fa-solid fa-dog"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Token Dynamics</div>
+                        <div class="message-time">April 13</div>
+                    </div>
+                    <div class="message-preview">Shiba Inu (SHIB) team officially released ecosystem expansion plan Shibarium 2.0, SHIB price rose 78% in 24 hours.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-008">
+                <div class="message-icon">
+                    <i class="fa-solid fa-images"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">NFT Market</div>
+                        <div class="message-time">April 13</div>
+                    </div>
+                    <div class="message-preview">Blue chip NFT market recovery, trading volume breaks 1 billion USD for first time in three months, Bored Ape Yacht Club floor price up 35%.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-009">
+                <div class="message-icon">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Macro Economics</div>
+                        <div class="message-time">April 13</div>
+                    </div>
+                    <div class="message-preview">Federal Reserve announced 25 basis point rate cut to 4.5%, first rate cut in 18 months. Following this news, cryptocurrency market rallied across the board.</div>
+                </div>
+            </div>
+            
+            <div class="message-item market-message" data-type="market" data-id="market-010">
+                <div class="message-icon">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-title-row">
+                        <div class="message-title">Crypto Mining</div>
+                        <div class="message-time">April 12</div>
+                    </div>
+                    <div class="message-preview">Bitcoin fourth halving event countdown: only 18 days left, expected around May 1, 2025. This halving will reduce mining rewards from 6.25 BTC to 3.125 BTC.</div>
+                </div>
+            </div>
+            
+            <div class="load-more">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Load more
+            </div>
+            
+            <!-- Empty state when no messages -->
+            <div class="empty-state" style="display: none;">
+                <i class="fa-regular fa-bell-slash"></i>
+                <div class="empty-state-text">No messages</div>
+                <div class="empty-state-subtext">New messages will appear here</div>
+            </div>
+        </div>
+        
+        <!-- Bottom safe area -->
+        <div class="safe-area-bottom"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initialized');
+            
+            // Get DOM elements
+            const messageItems = document.querySelectorAll('.message-item');
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            const markAllReadBtn = document.getElementById('mark-all-read');
+            const settingsBtn = document.getElementById('settings-btn');
+            const loadMoreBtn = document.querySelector('.load-more');
+            const searchBtn = document.getElementById('search-btn');
+            const searchBar = document.getElementById('searchBar');
+            const searchInput = document.getElementById('searchInput');
+            const searchClear = document.getElementById('searchClear');
+            const searchCancel = document.getElementById('searchCancel');
+            const categoryTabsContainer = document.querySelector('.category-tabs');
+            
+            // Bottom navigation switching
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    console.log('Switch to: ' + this.querySelector('span').textContent);
+                });
+            });
+            
+            // Category tab switching
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const category = this.getAttribute('data-category');
+                    console.log('Switch category: ' + category);
+                    
+                    filterMessages(category);
+                });
+            });
+            
+            // Message click events
+            messageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const messageId = this.getAttribute('data-id');
+                    const messageType = this.getAttribute('data-type');
+                    
+                    console.log(`Click message: ID=${messageId}, Type=${messageType}`);
+                    
+                    // Mark as read
+                    if(this.classList.contains('unread')) {
+                        this.classList.remove('unread');
+                        
+                        // Update unread count for corresponding category
+                        updateUnreadCount(messageType);
+                        
+                        // Here you can send read status to server
+                        console.log(`Mark message ${messageId} as read`);
+                    }
+                    
+                    // Here you can add logic to show message details
+                    showMessageDetail(messageId, messageType);
+                });
+            });
+            
+            // Mark all as read button
+            markAllReadBtn.addEventListener('click', function() {
+                const unreadMessages = document.querySelectorAll('.message-item.unread');
+                const unreadCount = unreadMessages.length;
+                
+                if (unreadCount === 0) {
+                    alert('No unread messages');
+                    return;
+                }
+                
+                // Mark all messages as read
+                unreadMessages.forEach(message => {
+                    message.classList.remove('unread');
+                });
+                
+                // Update unread counts for all categories
+                updateAllUnreadCounts();
+                
+                // Show success message
+                alert(`Marked ${unreadCount} messages as read`);
+            });
+            
+            // Settings button click
+            settingsBtn.addEventListener('click', function() {
+                console.log('Open settings');
+                // Navigate to settings page
+                window.location.href = 'message_settings_app_en.html';
+            });
+            
+            // Load more button
+            loadMoreBtn.addEventListener('click', function() {
+                console.log('Load more messages');
+                // Simulate loading effect
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+                
+                // Simulate delayed loading
+                setTimeout(() => {
+                    // Here you can add actual loading logic
+                    this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Load more';
+                    alert('No more messages');
+                }, 1500);
+            });
+            
+            // Pull to refresh functionality
+            let startY = 0;
+            let refreshHint = document.querySelector('.pull-refresh-hint');
+            let messageContainer = document.querySelector('.message-list-container');
+            
+            messageContainer.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].pageY;
+                
+                if (window.scrollY === 0) {
+                    refreshHint.innerHTML = '<i class="fa-solid fa-arrow-down"></i> Pull to refresh';
+                    refreshHint.style.padding = '10px';
+                }
+            });
+            
+            messageContainer.addEventListener('touchmove', function(e) {
+                if (window.scrollY === 0) {
+                    let moveY = e.touches[0].pageY;
+                    let distance = moveY - startY;
+                    
+                    if (distance > 0) {
+                        refreshHint.innerHTML = '<i class="fa-solid fa-arrow-down"></i> Pull to refresh';
+                        
+                        if (distance > 60) {
+                            refreshHint.innerHTML = '<i class="fa-solid fa-arrow-up"></i> Release to refresh';
+                        }
+                    }
+                }
+            });
+            
+            messageContainer.addEventListener('touchend', function(e) {
+                if (window.scrollY === 0) {
+                    let endY = e.changedTouches[0].pageY;
+                    let distance = endY - startY;
+                    
+                    if (distance > 60) {
+                        // Trigger refresh
+                        refreshHint.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
+                        
+                        // Simulate refresh
+                        setTimeout(() => {
+                            refreshHint.innerHTML = '<i class="fa-solid fa-check"></i> Refresh successful';
+                            
+                            setTimeout(() => {
+                                refreshHint.innerHTML = '<i class="fa-solid fa-arrow-down"></i> Pull to refresh';
+                            }, 1000);
+                        }, 1500);
+                    }
+                }
+            });
+            
+            // Search functionality
+            let isSearchActive = false;
+            let originalMessages = [];
+            
+            // Search button click
+            searchBtn.addEventListener('click', function() {
+                showSearchBar();
+            });
+            
+            // Search cancel button
+            searchCancel.addEventListener('click', function() {
+                hideSearchBar();
+            });
+            
+            // Search clear button
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                searchClear.classList.remove('show');
+                clearSearchResults();
+            });
+            
+            // Search input events
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                if (query.length > 0) {
+                    searchClear.classList.add('show');
+                    performSearch(query);
+                } else {
+                    searchClear.classList.remove('show');
+                    clearSearchResults();
+                }
+            });
+            
+            // Search input key events
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideSearchBar();
+                }
+            });
+            
+            // Show search bar
+            function showSearchBar() {
+                isSearchActive = true;
+                searchBar.classList.add('show');
+                categoryTabsContainer.classList.add('search-active');
+                searchInput.focus();
+                console.log('Search bar activated');
+            }
+            
+            // Hide search bar
+            function hideSearchBar() {
+                isSearchActive = false;
+                searchBar.classList.remove('show');
+                categoryTabsContainer.classList.remove('search-active');
+                searchInput.value = '';
+                searchClear.classList.remove('show');
+                clearSearchResults();
+                console.log('Search bar deactivated');
+            }
+            
+            // Perform search
+            function performSearch(query) {
+                const lowerQuery = query.toLowerCase();
+                const allMessages = document.querySelectorAll('.message-item');
+                const dateDividers = document.querySelectorAll('.date-divider');
+                let visibleCount = 0;
+                let visibleDates = new Set();
+                
+                console.log('Searching for:', query);
+                
+                // Hide all date dividers first
+                dateDividers.forEach(divider => {
+                    divider.style.display = 'none';
+                });
+                
+                // Search through messages
+                allMessages.forEach(message => {
+                    const title = message.querySelector('.message-title').textContent.toLowerCase();
+                    const preview = message.querySelector('.message-preview').textContent.toLowerCase();
+                    
+                    if (title.includes(lowerQuery) || preview.includes(lowerQuery)) {
+                        message.style.display = 'flex';
+                        visibleCount++;
+                        
+                        // Find and record the date divider before this message
+                        let prevElement = message.previousElementSibling;
+                        while (prevElement) {
+                            if (prevElement.classList.contains('date-divider')) {
+                                visibleDates.add(prevElement);
+                                break;
+                            }
+                            prevElement = prevElement.previousElementSibling;
+                        }
+                    } else {
+                        message.style.display = 'none';
+                    }
+                });
+                
+                // Show relevant date dividers
+                visibleDates.forEach(divider => {
+                    divider.style.display = 'block';
+                });
+                
+                // Show/hide empty state
+                const emptyState = document.querySelector('.empty-state');
+                if (visibleCount === 0) {
+                    emptyState.style.display = 'block';
+                    emptyState.querySelector('.empty-state-text').textContent = 'No search results';
+                    emptyState.querySelector('.empty-state-subtext').textContent = `No messages found for "${query}"`;
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    loadMoreBtn.style.display = 'block';
+                }
+                
+                console.log(`Search results: ${visibleCount} messages found`);
+            }
+            
+            // Clear search results
+            function clearSearchResults() {
+                // Reset to current category filter
+                const activeTab = document.querySelector('.category-tab.active');
+                const activeCategory = activeTab.getAttribute('data-category');
+                filterMessages(activeCategory);
+                console.log('Search results cleared');
+            }
+            
+            // Function functions
+            
+            // Filter messages by category
+            function filterMessages(category) {
+                const allMessages = document.querySelectorAll('.message-item');
+                const dateDividers = document.querySelectorAll('.date-divider');
+                const emptyState = document.querySelector('.empty-state');
+                
+                // First hide all date dividers
+                dateDividers.forEach(divider => {
+                    divider.style.display = 'none';
+                });
+                
+                // Record visible message count and dates
+                let visibleCount = 0;
+                let visibleDates = new Set();
+                
+                // Filter messages
+                allMessages.forEach(message => {
+                    const messageType = message.getAttribute('data-type');
+                    
+                    if (category === 'all' || messageType === category) {
+                        message.style.display = 'flex';
+                        visibleCount++;
+                        
+                        // Record date divider before this message
+                        let prevElement = message.previousElementSibling;
+                        while (prevElement) {
+                            if (prevElement.classList.contains('date-divider')) {
+                                visibleDates.add(prevElement);
+                                break;
+                            }
+                            prevElement = prevElement.previousElementSibling;
+                        }
+                    } else {
+                        message.style.display = 'none';
+                    }
+                });
+                
+                // Show relevant date dividers
+                visibleDates.forEach(divider => {
+                    divider.style.display = 'block';
+                });
+                
+                // Show empty state or load more button
+                if (visibleCount === 0) {
+                    emptyState.style.display = 'block';
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    loadMoreBtn.style.display = 'block';
+                }
+            }
+            
+            // Update unread count
+            function updateUnreadCount(messageType) {
+                // Update unread count for specific category
+                categoryTabs.forEach(tab => {
+                    const category = tab.getAttribute('data-category');
+                    const badge = tab.querySelector('.badge');
+                    
+                    if (category === messageType || category === 'all') {
+                        let count = parseInt(badge.textContent) - 1;
+                        if (count < 0) count = 0;
+                        badge.textContent = count;
+                        
+                        if (count === 0) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // Update all unread counts
+            function updateAllUnreadCounts() {
+                const categories = {
+                    'all': 0,
+                    'system': 0,
+                    'trade': 0,
+                    'security': 0,
+                    'activity': 0,
+                    'market': 0
+                };
+                
+                // Recalculate unread messages
+                messageItems.forEach(item => {
+                    if (item.classList.contains('unread')) {
+                        const type = item.getAttribute('data-type');
+                        categories[type]++;
+                        categories['all']++;
+                    }
+                });
+                
+                // Update unread count for each category
+                categoryTabs.forEach(tab => {
+                    const category = tab.getAttribute('data-category');
+                    const badge = tab.querySelector('.badge');
+                    
+                    badge.textContent = categories[category];
+                    
+                    if (categories[category] === 0) {
+                        badge.style.display = 'none';
+                    } else {
+                        badge.style.display = 'inline-block';
+                    }
+                });
+            }
+            
+            // Show message details
+            function showMessageDetail(messageId, messageType) {
+                console.log(`View message details: ID=${messageId}, Type=${messageType}`);
+                // Navigate to message detail page
+                window.location.href = `message_detail_en.html?id=${messageId}&type=${messageType}`;
+            }
+        });
+    </script>
+</body>
+</html> 

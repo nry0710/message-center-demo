@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Message Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: #673ab7;
+            --primary-light: rgba(103, 58, 183, 0.1);
+            --secondary-color: #ff5722;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #eee;
+            --category-system: #3f51b5;
+            --category-trade: #4caf50;
+            --category-security: #f44336;
+            --category-activity: #ff9800;
+            --category-market: #2196f3;
+        }
+        
+        body {
+            background-color: #f4f5f9;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Header Navigation */
+        .header {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .back-btn:active {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .done-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px 12px;
+            font-weight: 500;
+        }
+        
+        .done-btn:active {
+            background-color: var(--primary-light);
+            border-radius: 4px;
+        }
+        
+        /* Notification Permission Warning */
+        .notification-warning {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            margin: 0;
+            padding: 16px;
+            display: none; /* Hidden by default, shown when notifications are disabled */
+        }
+        
+        .notification-warning.show {
+            display: block;
+        }
+        
+        .warning-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .warning-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .warning-icon {
+            font-size: 24px;
+            color: #fff;
+            margin-right: 12px;
+            opacity: 0.9;
+        }
+        
+        .warning-text {
+            color: #fff;
+            flex: 1;
+        }
+        
+        .warning-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .warning-desc {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        .enable-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        
+        .enable-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .enable-btn:active {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0.98);
+        }
+        
+        /* Settings Section */
+        .settings-section {
+            margin: 20px 0;
+            background-color: var(--card-bg);
+        }
+        
+        .section-title {
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-label {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .item-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+            margin-left: 16px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* Footer Information */
+        .settings-footer {
+            padding: 20px 16px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Navigation -->
+        <div class="header">
+            <button class="back-btn" id="backBtn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="header-title">Message Settings</div>
+            <button class="done-btn" id="doneBtn">Done</button>
+        </div>
+        
+        <!-- Notification Permission Warning -->
+        <div class="notification-warning" id="notificationWarning">
+            <div class="warning-content">
+                <div class="warning-left">
+                    <div class="warning-icon">
+                        <i class="fa-solid fa-bell-slash"></i>
+                    </div>
+                    <div class="warning-text">
+                        <div class="warning-title">Push Notifications Disabled</div>
+                        <div class="warning-desc">Your device has disabled notifications for this app. You won't receive push notifications until you enable them in your phone settings.</div>
+                    </div>
+                </div>
+                <button class="enable-btn" id="enableBtn">
+                    Enable
+                </button>
+            </div>
+        </div>
+        
+        <!-- Message Type Settings -->
+        <div class="settings-section">
+            <div class="section-title">Message Types to Receive</div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">System Notifications</div>
+                    <div class="item-desc">Platform system announcements, maintenance updates and official notifications</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="system-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">Trading Related</div>
+                    <div class="item-desc">Order execution, deposit and withdrawal notifications</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="trade-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">Security Alerts</div>
+                    <div class="item-desc">Account login, security setting changes and security-related notifications</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="security-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">Activity Announcements</div>
+                    <div class="item-desc">Platform activities, promotional information and marketing-related notifications</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="activity-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">Market Updates</div>
+                    <div class="item-desc">Price movements, market analysis and market-related notifications</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="market-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Footer Information -->
+        <div class="settings-footer">
+            Based on your settings, some important messages (such as security warnings, system maintenance) may be force-pushed.<br>
+            For more help, please contact customer service.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check notification permission on page load
+            checkNotificationPermission();
+            
+            // Back button
+            document.getElementById('backBtn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // Done button
+            document.getElementById('doneBtn').addEventListener('click', function() {
+                // Save settings
+                saveSettings();
+                
+                // Return to previous page
+                window.history.back();
+            });
+            
+            // Enable notifications button
+            document.getElementById('enableBtn').addEventListener('click', function() {
+                requestNotificationPermission();
+            });
+            
+            // Check notification permission status
+            function checkNotificationPermission() {
+                if ('Notification' in window) {
+                    const permission = Notification.permission;
+                    const warningElement = document.getElementById('notificationWarning');
+                    
+                    if (permission === 'denied' || permission === 'default') {
+                        // Show warning if notifications are denied or not requested
+                        warningElement.classList.add('show');
+                    } else if (permission === 'granted') {
+                        // Hide warning if notifications are granted
+                        warningElement.classList.remove('show');
+                    }
+                } else {
+                    // Browser doesn't support notifications, show warning
+                    document.getElementById('notificationWarning').classList.add('show');
+                }
+            }
+            
+            // Request notification permission
+            function requestNotificationPermission() {
+                if ('Notification' in window) {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission === 'granted') {
+                            // Hide warning banner
+                            document.getElementById('notificationWarning').classList.remove('show');
+                            alert('Notifications enabled successfully!');
+                        } else if (permission === 'denied') {
+                            // Show instructions to enable manually
+                            alert('Please enable notifications manually in your device settings:\n\nSettings > Apps > [App Name] > Notifications > Allow notifications');
+                        }
+                    });
+                } else {
+                    // Fallback for browsers that don't support notifications
+                    alert('Your browser does not support notifications. Please update your browser or use the mobile app.');
+                }
+            }
+            
+            // Toggle switch change event
+            const toggles = document.querySelectorAll('.toggle-switch input');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const id = this.id;
+                    const value = this.checked;
+                    console.log(`${id} set to ${value}`);
+                    
+                    // Here you can add logic to save to localStorage in real-time
+                });
+            });
+            
+            // Save all settings
+            function saveSettings() {
+                // Collect all settings
+                const settings = {
+                    messageTypes: {
+                        system: document.getElementById('system-toggle').checked,
+                        trade: document.getElementById('trade-toggle').checked,
+                        security: document.getElementById('security-toggle').checked,
+                        activity: document.getElementById('activity-toggle').checked,
+                        market: document.getElementById('market-toggle').checked
+                    }
+                };
+                
+                console.log('Save settings:', settings);
+                
+                // Here you can add logic to send settings to server
+                
+                // Show save success message
+                alert('Settings saved successfully');
+            }
+            
+            // Initialize settings (in real application should get from server or localStorage)
+            function initSettings() {
+                // Mock settings from server
+                const mockSettings = {
+                    messageTypes: {
+                        system: true,
+                        trade: true,
+                        security: true,
+                        activity: true,
+                        market: false
+                    }
+                };
+                
+                // Apply settings
+                document.getElementById('system-toggle').checked = mockSettings.messageTypes.system;
+                document.getElementById('trade-toggle').checked = mockSettings.messageTypes.trade;
+                document.getElementById('security-toggle').checked = mockSettings.messageTypes.security;
+                document.getElementById('activity-toggle').checked = mockSettings.messageTypes.activity;
+                document.getElementById('market-toggle').checked = mockSettings.messageTypes.market;
+            }
+            
+            // Load settings
+            initSettings();
+        });
+    </script>
+</body>
+</html> 

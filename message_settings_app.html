@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>消息設置</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: #673ab7;
+            --primary-light: rgba(103, 58, 183, 0.1);
+            --secondary-color: #ff5722;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #eee;
+            --category-system: #3f51b5;
+            --category-trade: #4caf50;
+            --category-security: #f44336;
+            --category-activity: #ff9800;
+            --category-market: #2196f3;
+        }
+        
+        body {
+            background-color: #f4f5f9;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 頂部導航欄 */
+        .header {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .back-btn:active {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .done-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px 12px;
+            font-weight: 500;
+        }
+        
+        .done-btn:active {
+            background-color: var(--primary-light);
+            border-radius: 4px;
+        }
+        
+        /* 設置區塊 */
+        .settings-section {
+            margin: 20px 0;
+            background-color: var(--card-bg);
+        }
+        
+        .section-title {
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-label {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .item-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        /* 開關按鈕 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+            margin-left: 16px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* 底部信息 */
+        .settings-footer {
+            padding: 20px 16px;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 頂部導航欄 -->
+        <div class="header">
+            <button class="back-btn" id="backBtn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="header-title">消息設置</div>
+            <button class="done-btn" id="doneBtn">完成</button>
+        </div>
+        
+        <!-- 接收類型設置 -->
+        <div class="settings-section">
+            <div class="section-title">接收消息類型</div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">系統通知</div>
+                    <div class="item-desc">平台系統公告、維護更新等官方通知</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="system-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">交易相關</div>
+                    <div class="item-desc">訂單成交、充值提現等交易操作的通知</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="trade-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">安全提醒</div>
+                    <div class="item-desc">帳戶登入、安全設置變更等安全相關通知</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="security-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">活動公告</div>
+                    <div class="item-desc">平台活動、優惠信息等營銷相關通知</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked id="activity-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div class="item-content">
+                    <div class="item-label">市場行情</div>
+                    <div class="item-desc">價格異動、市場分析等行情相關通知</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="market-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- 底部信息 -->
+        <div class="settings-footer">
+            依據您的設置，部分重要消息（如安全警告、系統維護）可能會強制推送。<br>
+            如需更多幫助，請聯絡客服。
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回按鈕
+            document.getElementById('backBtn').addEventListener('click', function() {
+                window.history.back();
+            });
+            
+            // 完成按鈕
+            document.getElementById('doneBtn').addEventListener('click', function() {
+                // 保存設置
+                saveSettings();
+                
+                // 返回上一頁
+                window.history.back();
+            });
+            
+            // 切換開關時存儲設置
+            const toggles = document.querySelectorAll('.toggle-switch input');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    const id = this.id;
+                    const value = this.checked;
+                    console.log(`${id} 設置為 ${value}`);
+                    
+                    // 這裡可以添加實時保存到localStorage的邏輯
+                });
+            });
+            
+            // 儲存所有設置
+            function saveSettings() {
+                // 收集所有設置
+                const settings = {
+                    messageTypes: {
+                        system: document.getElementById('system-toggle').checked,
+                        trade: document.getElementById('trade-toggle').checked,
+                        security: document.getElementById('security-toggle').checked,
+                        activity: document.getElementById('activity-toggle').checked,
+                        market: document.getElementById('market-toggle').checked
+                    }
+                };
+                
+                console.log('保存設置:', settings);
+                
+                // 這裡可以添加將設置發送到服務器的邏輯
+                
+                // 顯示保存成功提示
+                alert('設置已保存');
+            }
+            
+            // 初始化設置（實際應用中應從服務器或localStorage獲取）
+            function initSettings() {
+                // 模擬從服務器獲取設置
+                const mockSettings = {
+                    messageTypes: {
+                        system: true,
+                        trade: true,
+                        security: true,
+                        activity: true,
+                        market: false
+                    }
+                };
+                
+                // 應用設置
+                document.getElementById('system-toggle').checked = mockSettings.messageTypes.system;
+                document.getElementById('trade-toggle').checked = mockSettings.messageTypes.trade;
+                document.getElementById('security-toggle').checked = mockSettings.messageTypes.security;
+                document.getElementById('activity-toggle').checked = mockSettings.messageTypes.activity;
+                document.getElementById('market-toggle').checked = mockSettings.messageTypes.market;
+            }
+            
+            // 載入設置
+            initSettings();
+        });
+    </script>
+</body>
+</html> 
