@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiFinex Message Center Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .demo-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .demo-section:nth-child(1) { animation-delay: 0.1s; }
+        .demo-section:nth-child(2) { animation-delay: 0.2s; }
+        .demo-section:nth-child(3) { animation-delay: 0.3s; }
+
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.8rem;
+        }
+
+        .demo-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .demo-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .demo-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .link-icon {
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+
+        .link-text {
+            flex: 1;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: rgba(255,255,255,0.8);
+            animation: fadeIn 2s ease-out;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .stats h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .demo-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DigiFinex Message Center Demo</h1>
+            <p>Professional demonstration pages for the new message center system</p>
+        </div>
+
+        <div class="demo-grid">
+            <!-- Web Demos -->
+            <div class="demo-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🖥️</span>
+                    Web Demos
+                </h2>
+                <div class="demo-links">
+                    <a href="message_center_prototype_en.html" class="demo-link" target="_blank">
+                        <span class="link-icon">🏠</span>
+                        <span class="link-text">Message Center Home</span>
+                    </a>
+                    <a href="message_center_settings_en.html" class="demo-link" target="_blank">
+                        <span class="link-icon">⚙️</span>
+                        <span class="link-text">Message Settings</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- App Demos -->
+            <div class="demo-section">
+                <h2 class="section-title">
+                    <span class="section-icon">📱</span>
+                    Mobile App Demos
+                </h2>
+                <div class="demo-links">
+                    <a href="message_center_app_prototype_en.html" class="demo-link" target="_blank">
+                        <span class="link-icon">📱</span>
+                        <span class="link-text">App Message Center</span>
+                    </a>
+                    <a href="message_detail_en.html" class="demo-link" target="_blank">
+                        <span class="link-icon">📄</span>
+                        <span class="link-text">Message Detail Page</span>
+                    </a>
+                    <a href="message_settings_app_en.html" class="demo-link" target="_blank">
+                        <span class="link-icon">⚙️</span>
+                        <span class="link-text">App Settings</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other Pages -->
+            <div class="demo-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🏠</span>
+                    Other Pages
+                </h2>
+                <div class="demo-links">
+                    <a href="home_page.html" class="demo-link" target="_blank">
+                        <span class="link-icon">🏠</span>
+                        <span class="link-text">Homepage Demo</span>
+                    </a>
+                    <a href="digifinex_message_center_PRD.md" class="demo-link" target="_blank">
+                        <span class="link-icon">📋</span>
+                        <span class="link-text">Product Requirements Document</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <h3>🚀 Demo Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalPages">6</span>
+                    <small>Demo Pages</small>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="clickCount">0</span>
+                    <small>Total Clicks</small>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <small>Responsive</small>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">EN</span>
+                    <small>Language</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💡 <strong>Usage:</strong> Click any link to view demos. Use Ctrl/Cmd + Click to open in new tab.</p>
+            <p style="margin-top: 15px; opacity: 0.7;">© 2024 DigiFinex Message Center Demo</p>
+        </div>
+    </div>
+
+    <script>
+        // Click tracking
+        let clickCount = parseInt(localStorage.getItem('demoClickCount') || '0');
+        document.getElementById('clickCount').textContent = clickCount;
+
+        document.querySelectorAll('.demo-link').forEach(link => {
+            link.addEventListener('click', function() {
+                clickCount++;
+                localStorage.setItem('demoClickCount', clickCount.toString());
+                document.getElementById('clickCount').textContent = clickCount;
+            });
+        });
+
+        // Add loading animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.demo-section');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html> 

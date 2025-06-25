@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f5f9;
+            color: #333;
+            line-height: 1.5;
+        }
+        .header {
+            background-color: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 64px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            height: 32px;
+            transition: transform 0.2s ease;
+        }
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 4px;
+        }
+        .nav::-webkit-scrollbar {
+            display: none;
+        }
+        .nav-item {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            cursor: pointer;
+            position: relative;
+            margin-right: 8px;
+            white-space: nowrap;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background-color: rgba(103, 58, 183, 0.06);
+        }
+        .nav-item.dropdown::after {
+            content: "▼";
+            font-size: 8px;
+            margin-left: 5px;
+            color: #999;
+        }
+        .nav-item.active {
+            color: #673ab7;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background-color: #673ab7;
+            border-radius: 3px;
+        }
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-actions > div {
+            cursor: pointer;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            color: #555;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        .icon-button:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #ff5722;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(255,87,34,0.3);
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #673ab7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(103,58,183,0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .user-avatar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(103,58,183,0.3);
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        .theme-toggle:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 84px auto 40px;
+            padding: 0 24px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .mark-all-read-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #673ab7;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        .mark-all-read-btn:hover {
+            background-color: rgba(103,58,183,0.08);
+        }
+        .settings-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #673ab7;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        .settings-link:hover {
+            background-color: rgba(103,58,183,0.08);
+        }
+        .main-content {
+            display: flex;
+            gap: 24px;
+        }
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            max-height: calc(100vh - 140px);
+            position: sticky;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+        }
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px 16px 10px 42px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background-color: #f5f6fa;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #673ab7;
+            background-color: #fff;
+            box-shadow: 0 2px 12px rgba(103,58,183,0.12);
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .category-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .category-list::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .category-item:hover {
+            background-color: #f5f6fa;
+        }
+        .category-item.active {
+            background-color: rgba(103,58,183,0.1);
+        }
+        .category-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background-color: #f5f6fa;
+            margin-right: 12px;
+            color: #666;
+        }
+        .category-item.active .category-icon {
+            background-color: #673ab7;
+            color: white;
+        }
+        .category-name {
+            flex-grow: 1;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .category-item.active .category-name {
+            color: #673ab7;
+            font-weight: 600;
+        }
+        .unread-count {
+            background-color: #ff5722;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 24px;
+            height: 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+        }
+        .view-toggle {
+            display: none;
+        }
+        .view-toggle-button {
+            display: none;
+        }
+        .content-area {
+            flex-grow: 1;
+            min-width: 0; /* Necessary for flex items to properly shrink */
+        }
+        .message-list {
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+        }
+        .date-divider {
+            padding: 12px 20px;
+            background-color: #f9f9fc;
+            font-size: 14px;
+            font-weight: 600;
+            color: #673ab7;
+            border-bottom: 1px solid #eee;
+        }
+        .message-item {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .message-item:hover {
+            background-color: #f9f9fc;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .message-item.message-expanded {
+            background-color: #f9f9fc;
+        }
+        .unread-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #673ab7;
+            border-radius: 50%;
+            margin-right: 16px;
+            flex-shrink: 0;
+            margin-top: 6px;
+            box-shadow: 0 1px 3px rgba(103,58,183,0.3);
+        }
+        .message-content {
+            flex-grow: 1;
+            padding-right: 70px;
+        }
+        .message-title {
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .message-category {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+            color: white;
+        }
+        .message-category.system {
+            background-color: #3f51b5;
+        }
+        .message-category.trade {
+            background-color: #4caf50;
+        }
+        .message-category.security {
+            background-color: #f44336;
+        }
+        .message-category.activity {
+            background-color: #ff9800;
+        }
+        .message-category.market {
+            background-color: #2196f3;
+        }
+        .message-subtitle {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        .message-text {
+            font-size: 13px;
+            color: #666;
+            margin: 12px 0;
+            display: none;
+            line-height: 1.6;
+        }
+        .message-text a {
+            color: #673ab7;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .message-text a:hover {
+            text-decoration: underline;
+            color: #4527a0;
+        }
+        .message-time {
+            font-size: 12px;
+            color: #999;
+            position: absolute;
+            top: 18px;
+            right: 20px;
+        }
+        .read .unread-indicator {
+            display: none;
+        }
+        .read .message-title {
+            color: #666;
+            font-weight: 500;
+        }
+        .message-expanded .message-text {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .message-expanded .message-subtitle {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .no-results {
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            width: 400px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            z-index: 101;
+            display: none;
+            overflow: hidden;
+            animation: dropdownOpen 0.2s ease;
+        }
+        @keyframes dropdownOpen {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notification-dropdown.show {
+            display: block;
+        }
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background-color: #fafafa;
+        }
+        .notification-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        .notification-actions {
+            color: #673ab7;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 5px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .notification-actions:hover {
+            background-color: rgba(103,58,183,0.1);
+        }
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .notification-item:hover {
+            background-color: #f9f9fc;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-content {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+        }
+        .view-more {
+            text-align: center;
+            padding: 12px;
+            border-top: 1px solid #f0f0f0;
+            color: #673ab7;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-weight: 500;
+        }
+        .view-more:hover {
+            background-color: #f9f9fc;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.3);
+            z-index: 99;
+            display: none;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            transition: opacity 0.2s ease;
+        }
+        .overlay.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+        .pagination-item {
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+        .pagination-item:hover {
+            background-color: rgba(103,58,183,0.1);
+            color: #673ab7;
+        }
+        .pagination-item.active {
+            background-color: #673ab7;
+            color: white;
+            box-shadow: 0 2px 8px rgba(103,58,183,0.3);
+        }
+        .pagination-prev, .pagination-next {
+            width: auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+        .pagination-prev svg, .pagination-next svg {
+            width: 16px;
+            height: 16px;
+        }
+        .pagination-prev.disabled, .pagination-next.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background-color: transparent;
+            box-shadow: none;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        .toast {
+            background-color: #673ab7;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast svg {
+            margin-right: 8px;
+        }
+        /* Timeline view styles */
+        .timeline-view {
+            display: none;
+        }
+        .timeline-view.active {
+            display: block;
+        }
+        .timeline-day {
+            margin-bottom: 30px;
+        }
+        .timeline-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+        .timeline-items {
+            position: relative;
+        }
+        .timeline-items:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 8px;
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 36px;
+            padding-bottom: 24px;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #673ab7;
+            background-color: white;
+            z-index: 1;
+        }
+        .timeline-item.read:before {
+            border-color: #999;
+        }
+        .timeline-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .timeline-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+        }
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .container {
+                padding: 0 16px;
+            }
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+                margin-bottom: 24px;
+            }
+            .category-list {
+                max-height: 320px;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 12px;
+            }
+            .notification-dropdown {
+                width: calc(100% - 20px);
+                right: 10px;
+            }
+            .pagination-item {
+                min-width: 32px;
+                height: 32px;
+                margin: 0 2px;
+            }
+            .timeline-item {
+                padding-left: 30px;
+            }
+        }
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 16px;
+            }
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .message-category {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="home_page.html">
+                <img src="https://i.imgur.com/yUfYMBC.png" alt="DigiFinex" height="30">
+            </a>
+        </div>
+        <nav class="nav">
+            <a class="nav-item dropdown">Buy Crypto</a>
+            <a class="nav-item">Markets</a>
+            <a class="nav-item dropdown">Trade</a>
+            <a class="nav-item dropdown">Futures</a>
+            <a class="nav-item dropdown">Earn</a>
+            <a class="nav-item">DigiFinex Card 🔥</a>
+        </nav>
+        <div class="user-actions">
+            <div>Assets</div>
+            <div class="icon-button" id="notificationButton">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="notification-badge">7</span>
+            </div>
+            <div class="user-avatar">D</div>
+            <button class="theme-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+            <div class="notification-title">Notifications</div>
+            <div class="notification-actions">Mark as Read</div>
+        </div>
+        <div class="notification-item">
+            <div class="notification-content">Merged Mining/Cloud Mining Product Purchase Completed</div>
+            <div class="notification-time">2025-03-21 09:48:16</div>
+        </div>
+        <div class="notification-item">
+            <div class="notification-content">Merged Mining/Cloud Mining Product Purchase Completed</div>
+            <div class="notification-time">2025-03-21 09:46:54</div>
+        </div>
+        <div class="notification-item">
+            <div class="notification-content">Merged Mining/Cloud Mining Product Purchase Completed</div>
+            <div class="notification-time">2025-03-20 15:19:10</div>
+        </div>
+        <div class="notification-item">
+            <div class="notification-content">Merged Mining/Cloud Mining Product Purchase Completed</div>
+            <div class="notification-time">2025-03-20 15:17:04</div>
+        </div>
+        <div class="view-more">
+            <a href="message_center_prototype_en.html">View More ></a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="title">Message Center</div>
+            <div class="header-actions">
+                <button class="mark-all-read-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    Mark All as Read
+                </button>
+                <a href="message_center_settings_en.html" class="settings-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Message Settings
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="search-container">
+                    <div class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <input type="text" class="search-box" placeholder="Search message keywords">
+                </div>
+                
+                <div class="category-list">
+                    <div class="category-item active" data-type="all">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                            </svg>
+                        </div>
+                        <div class="category-name">All</div>
+                        <div class="unread-count">50</div>
+                    </div>
+                    <div class="category-item" data-type="system">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg>
+                        </div>
+                        <div class="category-name">System Notifications</div>
+                        <div class="unread-count">10</div>
+                    </div>
+                    <div class="category-item" data-type="trade">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="category-name">Trading Related</div>
+                        <div class="unread-count">10</div>
+                    </div>
+                    <div class="category-item" data-type="security">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <div class="category-name">Security Alerts</div>
+                        <div class="unread-count">10</div>
+                    </div>
+                    <div class="category-item" data-type="activity">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="category-name">Activity Announcements</div>
+                        <div class="unread-count">10</div>
+                    </div>
+                    <div class="category-item" data-type="market">
+                        <div class="category-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="20" x2="12" y2="10"></line>
+                                <line x1="18" y1="20" x2="18" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div class="category-name">Market Updates</div>
+                        <div class="unread-count">10</div>
+                    </div>
+                </div>
+                
+                <!-- View toggle button removed -->
+            </div>
+            
+            <div class="content-area">
+                <div class="message-list" id="messageList">
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system" data-message-id="system-001">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                System Update Notification
+                            </div>
+                            <div class="message-subtitle">DigiFinex System Update: New Trading Interface Now Live</div>
+                            <div class="message-text">Dear User:<br><br>DigiFinex platform has completed a system update, and the new trading interface is now live! The new version brings the following optimizations:<br><br>1. New K-line charts with support for more technical indicators<br>2. Optimized order management interface for more intuitive order execution<br>3. New one-click order feature for quick market opportunity capture<br>4. Enhanced depth chart display for clear market trends<br>5. New price alert feature for instant important price notifications<br><br>Experience the new trading interface now and enjoy a smoother trading experience!<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 09:30:15</div>
+                    </div>
+
+                    <div class="message-item" data-type="system" data-message-id="system-002">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Deposit Confirmation
+                            </div>
+                            <div class="message-subtitle">USDT deposit successful, amount 5,000 USDT</div>
+                            <div class="message-text">Dear User:<br><br>Your deposit operation has been completed successfully.<br><br>Currency: USDT<br>Network: TRC20<br>Amount: 5,000.00<br>Status: Received<br>Transaction ID: TRx7a2Z9bK4L5p8M3nQwR6sTuVy1X0zY<br>Receipt Time: 2025-04-20 09:28:36<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 09:28:36</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Order Execution Notification
+                            </div>
+                            <div class="message-subtitle">Your BTC/USDT limit buy order has been executed</div>
+                            <div class="message-text">Dear User:<br><br>Your order has been executed successfully.<br><br>Trading Pair: BTC/USDT<br>Order Type: Limit Buy<br>Price: 68,500.00 USDT<br>Quantity: 0.15000000 BTC<br>Total: 10,275.00 USDT<br>Fee: 10.28 USDT<br>Execution Time: 2025-04-20 09:15:42<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 09:15:42</div>
+                    </div>
+
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Take Profit Order Triggered
+                            </div>
+                            <div class="message-subtitle">ETH/USDT take profit order has been triggered</div>
+                            <div class="message-text">Dear User:<br><br>Your take profit order has been triggered and executed successfully.<br><br>Trading Pair: ETH/USDT<br>Order Type: Take Profit Sell<br>Trigger Price: 6,200.00 USDT<br>Actual Execution Price: 6,205.50 USDT<br>Quantity: 2.50000000 ETH<br>Total: 15,513.75 USDT<br>Fee: 15.51 USDT<br>Execution Time: 2025-04-20 08:45:18<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 08:45:18</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Login Security Alert
+                            </div>
+                            <div class="message-subtitle">Suspicious IP login attempt detected</div>
+                            <div class="message-text">Dear User:<br><br>We have detected suspicious login attempts on your account.<br><br>Time: 2025-04-20 07:18:42<br>IP Address: 185.73.XX.XX<br>Location: Ukraine<br>Device: Unknown Device<br>Status: Blocked<br><br>If this was not your own operation, we recommend immediately:<br>1. Change your login password<br>2. Enable or reset two-factor authentication<br>3. Check API key permissions<br><br>To protect your assets, we recommend regularly updating your password and using strong password strategies.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 07:20:05</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Fund Security Alert
+                            </div>
+                            <div class="message-subtitle">Large fund withdrawal operation confirmation</div>
+                            <div class="message-text">Dear User:<br><br>We have detected a large fund withdrawal operation on your account.<br><br>Currency: BTC<br>Amount: 2.50000000<br>Equivalent Value: 171,250.00 USDT<br>Time: 2025-04-20 06:38:10<br><br>To protect your assets, large withdrawals require additional security verification. Please complete verification within 30 minutes, otherwise the transaction will be automatically cancelled.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-20 06:38:15</div>
+                    </div>
+
+                    <!-- Activity announcement type messages -->
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                New Token Listing Announcement
+                            </div>
+                            <div class="message-subtitle">New token SEI coming soon, participate to share 100,000 USDT reward pool</div>
+                            <div class="message-text">Dear User:<br><br>DigiFinex will soon list SEI (Seinetwork) token! As a Layer 1 blockchain, SEI is dedicated to providing high-performance, low-latency infrastructure for DeFi applications.<br><br>Listing Details:<br>- Deposit Open: April 22, 2025 12:00 (UTC+8)<br>- Trading Open: April 23, 2025 12:00 (UTC+8)<br>- Trading Pairs: SEI/USDT, SEI/BTC<br><br>Participate in activities to share 100,000 USDT:<br>1. Deposit Rewards: Deposit SEI to receive platform token airdrops<br>2. Trading Mining: Trading volume ranking rewards<br>3. Holding Airdrops: Hold SEI to participate in ecosystem project token airdrops<br><br>Act now and seize the early investment opportunity in SEI!<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 18:30:00</div>
+                    </div>
+
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                Trading Competition
+                            </div>
+                            <div class="message-subtitle">BTC Quarterly Futures Trading Competition Now Open</div>
+                            <div class="message-text">Dear User:<br><br>The BTC Quarterly Futures Trading Competition is now open! Trade BTC quarterly futures during the event period to win generous rewards.<br><br>Event Period: April 20, 2025 - May 5, 2025<br><br>Reward Structure:<br>- Champion: 15,000 USDT<br>- Runner-up: 8,000 USDT<br>- Third Place: 5,000 USDT<br>- 4th-10th Place: 1,000 USDT each<br>- 11th-50th Place: 200 USDT each<br><br>Participation Method:<br>1. Trade BTC quarterly futures during the event period<br>2. Ranking based on net profit rate<br>3. Minimum entry capital 1,000 USDT<br><br>Additionally, all participating users can enjoy 20% discount on futures trading fees!<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 16:00:00</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system" data-message-id="system-003">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Withdrawal Success Notification
+                            </div>
+                            <div class="message-subtitle">ETH withdrawal successful, amount 1.5 ETH</div>
+                            <div class="message-text">Dear User:<br><br>Your withdrawal request has been processed successfully.<br><br>Currency: ETH<br>Network: ETH<br>Amount: 1.50000000<br>Fee: 0.00050000 ETH<br>Status: Completed<br>Block Confirmations: 64/64<br>Withdrawal Address: 0x7D8c5F8a3b2E9B7E6a4BcA1F6a682E71EC98F72B<br>Transaction Hash: 0x9b3a7fb2e8c4d5f6a7e1b0d2c3a4f5e6d7c8b9a0<br>Completion Time: 2025-04-19 15:48:22<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 15:48:22</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Margin Trading Notification
+                            </div>
+                            <div class="message-subtitle">You have successfully borrowed 20,000 USDT</div>
+                            <div class="message-text">Dear User:<br><br>You have successfully borrowed the following assets:<br><br>Borrowed Currency: USDT<br>Borrowed Amount: 20,000.00<br>Annual Interest Rate: 7.3%<br>Borrowing Time: 2025-04-19 14:30:45<br>Repayment Term: No fixed term (daily interest accrual)<br>Borrowing Account: Spot Margin Account<br><br>Please Note:<br>1. System automatically deducts interest from your account daily<br>2. Maintain appropriate leverage ratio to avoid liquidation risk<br>3. Can repay partially or in full at any time<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 14:30:45</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Identity Verification Upgrade
+                            </div>
+                            <div class="message-subtitle">Recommend enabling facial recognition login feature</div>
+                            <div class="message-text">Dear User:<br><br>To further enhance your account security, we have launched a facial recognition login feature.<br><br>Facial recognition offers the following advantages:<br>1. More secure than traditional passwords<br>2. More convenient login process, no need to enter passwords<br>3. Effectively prevents phishing website risks<br>4. Account remains protected even if password is compromised<br><br>Activation Method:<br>Login to DigiFinex APP > My Account > Security Center > Facial Recognition > Follow prompts to complete setup<br><br>We strongly recommend enabling this feature to safeguard your digital assets.<br><br><a href="#">Enable Now</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 12:15:30</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system" data-message-id="system-004">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Investment Product Maturity
+                            </div>
+                            <div class="message-subtitle">Your USDT fixed income investment product has matured</div>
+                            <div class="message-text">Dear User:<br><br>Your USDT fixed income investment product has matured.<br><br>Product Name: 30-Day Fixed USDT<br>Subscription Amount: 10,000.00 USDT<br>Annual Yield: 12%<br>Actual Return: 328.77 USDT<br>Purchase Time: 2025-03-19 10:00:00<br>Maturity Time: 2025-04-19 10:00:00<br><br>Principal and returns have been automatically deposited into your funding account. You can choose to reinvest or convert to other assets.<br><br><a href="#">View Funding Account</a><br><a href="#">Reinvest</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 10:00:00</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Price Alert
+                            </div>
+                            <div class="message-subtitle">BTC price breaks through 70,000 USDT</div>
+                            <div class="message-text">Dear User:<br><br>Your price alert has been triggered.<br><br>Currency: BTC<br>Current Price: 70,250.00 USDT<br>Alert Condition: Price above 70,000.00 USDT<br>Trigger Time: 2025-04-19 09:42:18<br><br>Bitcoin has broken through the psychological barrier, with market sentiment turning strongly bullish. According to technical analysis, the next major resistance level after breaking 70,000 USD is in the 72,500-73,000 USD range.<br><br>You can set new price alerts or view real-time market data to capture trading opportunities.<br><br><a href="#">View Market Data</a><br><a href="#">Set New Alert</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 09:42:18</div>
+                    </div>
+
+                    <!-- Activity announcement type messages -->
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                Holiday Event
+                            </div>
+                            <div class="message-subtitle">2025 Labor Day Special Event: Trade to Win Big</div>
+                            <div class="message-text">Dear User:<br><br>As Labor Day 2025 approaches, DigiFinex launches multiple promotional events, limited to 7 days!<br><br>Event 1: Trading Lottery<br>Complete any trade during the event period to get lottery chances, with maximum prize of 8,888 USDT!<br><br>Event 2: Deposit Rewards<br>Single deposit ≥1,000 USDT to receive platform token airdrops, more deposits mean more rewards.<br><br>Event 3: New User Exclusive<br>New registered users completing KYC verification will receive 88 USDT newcomer package.<br><br>Event Period: April 28, 2025 - May 5, 2025<br><br>Act now and earn extra returns during Labor Day!<br><br><a href="#">View Complete Event Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-19 08:00:00</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                New Device Login
+                            </div>
+                            <div class="message-subtitle">Your account login detected on new device</div>
+                            <div class="message-text">Dear User:<br><br>We have detected your account login on a new device.<br><br>Login Details:<br>Time: 2025-04-18 21:35:12<br>Device Model: iPhone 16 Pro<br>Device System: iOS 19.2<br>IP Location: Taipei City<br>Browser: Safari<br><br>If this was your own operation, you can ignore this message.<br><br>If this was not your own operation, please immediately:<br>1. <a href="#">Change login password</a><br>2. <a href="#">Enable two-factor authentication</a><br>3. <a href="#">Contact customer service</a><br><br>We recommend regularly changing passwords and using unique passwords different from other websites.</div>
+                        </div>
+                        <div class="message-time">2025-04-18 21:36:08</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Airdrop Received
+                            </div>
+                            <div class="message-subtitle">Congratulations! You received 200 GRT token airdrop</div>
+                            <div class="message-text">Dear User:<br><br>Congratulations! Your reward from participating in The Graph (GRT) ecosystem airdrop event has been distributed.<br><br>Received Token: GRT<br>Amount: 200.00000000<br>Approximate Value: 260 USDT (current market price)<br>Distribution Time: 2025-04-18 18:00:00<br>Reason: Holding relevant NFT qualification proof<br><br>Rewards have been automatically deposited into your spot account. You can choose to hold, trade, or withdraw.<br><br><a href="#">View Assets</a><br><a href="#">Learn About GRT Project</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 18:00:00</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Contract Liquidation Notification
+                            </div>
+                            <div class="message-subtitle">Your SOL/USDT perpetual contract has triggered forced liquidation</div>
+                            <div class="message-text">Dear User:<br><br>Your SOL/USDT perpetual contract has been forcibly liquidated by the system due to insufficient maintenance margin.<br><br>Contract Details:<br>Contract: SOL/USDT Perpetual<br>Position Direction: Long<br>Leverage: 20x<br>Entry Price: 125.00 USDT<br>Liquidation Price: 110.50 USDT<br>Position Size: 100.00 SOL<br>Liquidation Time: 2025-04-18 16:28:45<br>P&L: -1,450.00 USDT<br><br>Please Note: High leverage trading carries higher risks. We recommend setting reasonable risk management strategies and using stop-loss orders to protect your positions.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 16:28:45</div>
+                    </div>
+
+                    <!-- Activity announcement type messages -->
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                Educational Event
+                            </div>
+                            <div class="message-subtitle">Free Cryptocurrency Trading Technical Analysis Course</div>
+                            <div class="message-text">Dear User:<br><br>DigiFinex will host an online cryptocurrency trading technical analysis course soon, completely free!<br><br>Course Content:<br>- Basic candlestick pattern recognition<br>- Usage of major technical indicators<br>- Drawing trend lines and support/resistance levels<br>- Trading strategy development and risk management<br>- Real case analysis and practical exercises<br><br>Instructor: Tom Chen (10 years cryptocurrency trading experience, former Wall Street quantitative trader)<br><br>Course Time: April 25, 2025 20:00-22:00 (UTC+8)<br><br>Registration: Click the link below to fill out the form, limited spots available on first-come-first-served basis!<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 14:30:00</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Password Update Reminder
+                            </div>
+                            <div class="message-subtitle">Your password has not been updated for over 90 days</div>
+                            <div class="message-text">Dear User:<br><br>We notice that your account password has not been updated for over 90 days. To protect your account security, we recommend regularly changing your login password.<br><br>Last Password Update: 2025-01-18<br>Recommended Update Deadline: 2025-04-22<br><br>Strong Password Recommendations:<br>1. Password length at least 12 characters<br>2. Include uppercase and lowercase letters, numbers, and special symbols<br>3. Avoid using birthdays, phone numbers, and other personal information<br>4. Use different passwords for different platforms<br><br>Update your password immediately to protect your digital asset security.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 10:00:00</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Order Placed Successfully
+                            </div>
+                            <div class="message-subtitle">Your ETH/USDT limit order has been successfully placed</div>
+                            <div class="message-text">Dear User:<br><br>Your order has been successfully placed and is waiting for market conditions to match for execution.<br><br>Trading Pair: ETH/USDT<br>Order Type: Limit Buy<br>Price: 5,800.00 USDT<br>Quantity: 3.00000000 ETH<br>Total: 17,400.00 USDT<br>Order Time: 2025-04-18 09:15:20<br><br>You can view or cancel this order at any time. Once the market price reaches your set price conditions, the system will automatically execute the trade for you.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 09:15:20</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Grid Trading Report
+                            </div>
+                            <div class="message-subtitle">Your BTC/USDT grid trading has been running for 7 days</div>
+                            <div class="message-text">Dear User:<br><br>Your BTC/USDT grid trading bot has been running for 7 days. Here is the operation report:<br><br>Strategy Name: BTC/USDT Mid-line Grid<br>Operation Period: April 11, 2025 08:00:00 to April 18, 2025 08:00:00<br>Grid Upper Limit: 72,000 USDT<br>Grid Lower Limit: 65,000 USDT<br>Grid Count: 20<br>Investment: 15,000 USDT<br><br>Performance Overview:<br>- Completed Trades: 48<br>- Cumulative Returns: 358.65 USDT (2.39%)<br>- Annualized Return Rate: ~124.7%<br><br>Recommended Action: Continue maintaining current grid settings, market volatility meets expectations.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-18 08:05:00</div>
+                    </div>
+
+                    <!-- Activity announcement type messages -->
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                Platform Benefits
+                            </div>
+                            <div class="message-subtitle">VIP Users Exclusive: Free Exchange Anniversary Commemorative NFT</div>
+                            <div class="message-text">Dear VIP User:<br><br>To celebrate DigiFinex's 6th anniversary, we have specially prepared limited edition commemorative NFTs for VIP users!<br><br>NFT Features:<br>- Limited edition of 1,000 pieces<br>- Designed by professional artists<br>- Holders enjoy exclusive DigiFinex ecosystem benefits<br>- Can be used for platform governance voting in the future<br>- Has collection and appreciation potential<br><br>Claim Method:<br>Click the button below, fill in your ETH wallet address, and NFTs will be distributed within 48 hours.<br><br>Claim Period: Before April 20, 2025<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-17 16:00:00</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Fee Rebate
+                            </div>
+                            <div class="message-subtitle">Trading fee rebate program: 45.68 USDT rebated</div>
+                            <div class="message-text">Dear User:<br><br>Based on your VIP level and trading volume, the system has rebated your trading fees from last week.<br><br>Rebate Details:<br>Period: April 8, 2025 - April 15, 2025<br>Total Trading Volume: 228,400.00 USDT<br>Generated Fees: 228.40 USDT<br>Rebate Rate: 20%<br>Rebate Amount: 45.68 USDT<br>Rebate Time: 2025-04-17 12:00:00<br><br>Fees have been directly deposited into your spot account. Thank you for your support of DigiFinex!<br><br><a href="#">Learn About VIP Benefits</a><br><a href="#">View Trading Records</a></div>
+                        </div>
+                        <div class="message-time">2025-04-17 12:00:00</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Phishing Website Warning
+                            </div>
+                            <div class="message-subtitle">Fake DigiFinex phishing websites discovered, please stay alert</div>
+                            <div class="message-text">Dear User:<br><br>We have recently discovered multiple phishing websites impersonating the official DigiFinex website. These websites aim to steal users' login credentials and assets.<br><br>Please note the following security tips:<br>1. Always access DigiFinex through official channels (digifinex.com)<br>2. Verify URL spelling, beware of similar domains like "diginifex.com", "digi-finex.com", etc.<br>3. Check the security lock icon and SSL certificate before the URL<br>4. Do not click on suspicious emails or social media links<br>5. Enable two-factor authentication to increase account security<br><br>DigiFinex will never ask you to reveal passwords or private keys. If you notice any suspicious activity, please contact customer service immediately.<br><br><a href="#">Learn More Security Tips</a><br><a href="#">Contact Customer Service</a></div>
+                        </div>
+                        <div class="message-time">2025-04-17 10:30:00</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Funding Rate Notification
+                            </div>
+                            <div class="message-subtitle">BTC perpetual contract funding rate to be charged soon</div>
+                            <div class="message-text">Dear User:<br><br>According to perpetual contract rules, the system will charge BTC/USDT perpetual contract funding rate in 3 hours (2025-04-17 08:00:00).<br><br>Current Funding Rate: 0.0185%<br>Expected Next Rate: 0.0112%<br>Settlement Time: Every 8 hours (UTC+0 time 00:00, 08:00, 16:00)<br><br>Funding Rate Explanation:<br>- Positive: Longs pay shorts<br>- Negative: Shorts pay longs<br>- Rate calculated as percentage of position value<br><br>Your current contract positions:<br>- BTC/USDT Long: 0.5 BTC<br>- Expected funding rate payment: ~0.38 USDT<br><br><a href="#">View Contract Details</a><br><a href="#">Learn About Funding Rate Mechanism</a></div>
+                        </div>
+                        <div class="message-time">2025-04-17 05:00:00</div>
+                    </div>
+
+                    <!-- Activity announcement type messages -->
+                    <div class="message-item" data-type="activity">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category activity">Activity Announcement</span>
+                                Feature Launch
+                            </div>
+                            <div class="message-subtitle">New feature launched: One-click conversion of small assets to platform tokens</div>
+                            <div class="message-text">Dear User:<br><br>DigiFinex's new feature "Small Asset Conversion" is now live! You can convert small cryptocurrencies to platform tokens with one click, effectively organizing your assets.<br><br>Feature Highlights:<br>- Supports conversion of 50+ small cryptocurrencies<br>- Zero-fee conversion<br>- Real-time exchange rates, fair and transparent<br>- Minimum conversion equivalent to 0.1 USDT<br>- Can select up to 20 currencies for simultaneous conversion<br><br>How to Use:<br>DigiFinex APP or Web > Assets > Spot Account > Small Asset Conversion<br><br>Experience this convenient feature now and say goodbye to scattered asset troubles!<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-16 23:30:00</div>
+                    </div>
+
+                    <!-- System notification type messages -->
+                    <div class="message-item" data-type="system">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category system">System Notification</span>
+                                Staking Rewards Distributed
+                            </div>
+                            <div class="message-subtitle">Your SOL staking rewards have been distributed</div>
+                            <div class="message-text">Dear User:<br><br>Your Solana (SOL) staking rewards have been distributed to your account.<br><br>Staking Details:<br>Staking Currency: SOL<br>Staking Amount: 150.00000000 SOL<br>Staking Term: Flexible<br>Annual Yield: 7.8%<br>This Reward: 0.32054795 SOL<br>Reward Period: April 10, 2025 to April 16, 2025<br>Distribution Time: 2025-04-16 22:00:00<br><br>Rewards have been automatically added to your staking principal to continue earning interest. You can withdraw or increase staking amount at any time.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-16 22:00:00</div>
+                    </div>
+
+                    <!-- Security alert type messages -->
+                    <div class="message-item" data-type="security">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category security">Security Alert</span>
+                                Security Tool Update
+                            </div>
+                            <div class="message-subtitle">Google Authenticator to launch important update</div>
+                            <div class="message-text">Dear User:<br><br>Google will launch an important update for the Google Authenticator app on April 25, 2025. This update will optimize security but may require some users to reset two-factor authentication.<br><br>To avoid being unable to login to DigiFinex after the update, please:<br>1. Ensure you have backed up your two-factor authentication recovery codes<br>2. Consider adding backup verification methods to your account in advance (such as SMS or email verification)<br>3. Backup your Google Authenticator data before updating<br><br>If you encounter any issues after the update, please contact us through official customer service channels, and we will prioritize handling your case.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-16 18:45:00</div>
+                    </div>
+
+                    <!-- Trading related type messages -->
+                    <div class="message-item" data-type="trade">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category trade">Trading Related</span>
+                                Leverage Adjustment Alert
+                            </div>
+                            <div class="message-subtitle">ETH/USDT leverage position approaching liquidation price</div>
+                            <div class="message-text">Dear User:<br><br>Your ETH/USDT leverage position has a high risk rate, with current price approaching the liquidation price.<br><br>Position Details:<br>Trading Pair: ETH/USDT<br>Position Direction: Long<br>Leverage: 5x<br>Position Size: 10.00000000 ETH<br>Average Entry Price: 5,900.00 USDT<br>Current Market Price: 5,720.00 USDT (-3.05%)<br>Current Risk Rate: 87%<br>Estimated Liquidation Price: 5,610.00 USDT<br><br>To avoid position liquidation, we recommend:<br>1. Add margin<br>2. Partially close position to reduce risk<br>3. Reduce leverage<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-16 14:30:00</div>
+                    </div>
+
+                    <!-- Market update type messages -->
+                    <div class="message-item" data-type="market">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category market">Market Updates</span>
+                                Market Movement Alert
+                            </div>
+                            <div class="message-subtitle">BTC breaks through 75,000 USD all-time high, up 12.8% in 24 hours</div>
+                            <div class="message-text">Dear User:<br><br>Bitcoin (BTC) price has surged dramatically in the past 24 hours, breaking through the 75,000 USD barrier to reach a new all-time high. This price breakthrough is primarily driven by the following factors:<br><br>1. Institutional investors significantly increasing holdings<br>2. Enhanced Federal Reserve rate cut expectations<br>3. Mainstream banks launching cryptocurrency custody services<br>4. Continued Bitcoin ETF fund inflows<br><br>Technical Analysis:<br>- All major moving averages showing strong buy signals<br>- RSI at 78, entering overbought territory but still has upward momentum<br>- Trading volume 205% higher than 30-day average<br><br>Market Forecast:<br>Analysts generally expect BTC to test the 80,000 USD barrier in the short term, but also warn of possible pullbacks. We recommend staying alert and trading cautiously.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-15 23:45:10</div>
+                    </div>
+
+                    <div class="message-item" data-type="market">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category market">Market Updates</span>
+                                Token Focus
+                            </div>
+                            <div class="message-subtitle">ETH 2.0 completes final upgrade, price surges 15% briefly</div>
+                            <div class="message-text">Dear User:<br><br>Ethereum (ETH) has completed the long-awaited final stage upgrade of 2.0, bringing the following major improvements:<br><br>1. Transaction processing capacity increased to 100,000 TPS<br>2. Gas fees reduced by approximately 75%<br>3. Smart contract functionality expansion<br>4. Significantly improved security and scalability<br><br>Market Reaction:<br>- ETH price rose 15% within 1 hour after upgrade<br>- 24-hour trading volume increased 320%<br>- ETH/BTC trading pair ratio increased 8.2%<br><br>Analyst View:<br>"This upgrade gives Ethereum absolute advantages in speed and cost compared to other Layer 1 blockchains. We expect ETH price to challenge the 10,000 USD barrier within the next 3 months." — BlockFi Senior Analyst<br><br>We recommend paying attention to ETH ecosystem-related tokens such as LINK, UNI, AAVE, etc., as these tokens may also benefit from this upgrade.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-15 18:22:35</div>
+                    </div>
+
+                    <div class="message-item" data-type="market">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category market">Market Updates</span>
+                                Regulatory Updates
+                            </div>
+                            <div class="message-subtitle">Singapore Monetary Authority releases crypto-friendly new policies</div>
+                            <div class="message-text">Dear User:<br><br>The Monetary Authority of Singapore (MAS) today released a new version of the cryptocurrency regulatory framework, significantly relaxing restrictions on cryptocurrency exchanges and service providers. Key policy points:<br><br>1. Simplified exchange license application process<br>2. Allow compliant exchanges to provide broader token trading services<br>3. Reduced exchange capital requirements<br>4. Introduction of "regulatory sandbox" to promote innovation<br><br>Market Impact:<br>- Singapore local cryptocurrency project stocks up average 20%<br>- Expected over 30 cryptocurrency companies to relocate headquarters to Singapore<br>- Institutional investor interest significantly increased<br><br>This policy shift suggests Asia may lead the next wave of crypto-friendly regulatory trends, with other countries like South Korea and Japan already indicating they will consider similar measures.<br><br>Market analysts believe this policy will have a positive impact on the overall cryptocurrency market, especially beneficial for large exchanges and projects with strong compliance.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-15 14:15:00</div>
+                    </div>
+
+                    <div class="message-item" data-type="market">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category market">Market Updates</span>
+                                Technical Analysis
+                            </div>
+                            <div class="message-subtitle">SOL breaks through key resistance level, short-term target 200 USD</div>
+                            <div class="message-text">Dear User:<br><br>Solana (SOL) recent price action shows strong upward momentum, breaking through the key resistance level of 155 USD yesterday, currently trading at 168.5 USD.<br><br>Technical Analysis:<br>- Broke through long-term downtrend line, forming new upward channel<br>- MACD indicator showing strong buy signal<br>- Volume increased 135% compared to 20-day average<br>- 150 USD has transformed into support level<br><br>Key Price Levels:<br>- Support: 150 USD, 135 USD<br>- Resistance: 175 USD, 200 USD<br><br>Fundamental Support:<br>1. Solana ecosystem dApp count increased 65% in three months<br>2. Network transaction speed significantly improved<br>3. Institutional investors continue to accumulate<br><br>Risk Factors:<br>- Technical indicators show short-term overbought<br>- Overall market volatility risk increased<br><br>Short-term, SOL is expected to test the 175 USD resistance level, with target price of 200 USD after breakthrough.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-14 21:30:12</div>
+                    </div>
+
+                    <div class="message-item" data-type="market">
+                        <div class="unread-indicator"></div>
+                        <div class="message-content">
+                            <div class="message-title">
+                                <span class="message-category market">Market Updates</span>
+                                Industry News
+                            </div>
+                            <div class="message-subtitle">World's largest asset management company to launch cryptocurrency investment products</div>
+                            <div class="message-text">Dear User:<br><br>According to reliable sources, BlackRock will launch a diversified cryptocurrency investment fund next month, which will invest in Bitcoin, Ethereum, and other mainstream crypto assets.<br><br>Important Details:<br>- Fund size expected to exceed 10 billion USD<br>- Will invest in 10-15 cryptocurrencies<br>- Asset allocation: Bitcoin (45%), Ethereum (30%), Others (25%)<br>- Targeting qualified institutional investors<br>- Minimum investment of 10 million USD<br><br>Market Significance:<br>This is the first time a traditional financial giant has directly entered the cryptocurrency investment field, showing mainstream institutions' recognition of digital assets has significantly increased. Analysts generally believe this move will attract more traditional institutions to enter, potentially triggering a new bull market.<br><br>Expected Impact:<br>- Increased market fund inflows expected<br>- Enhanced cryptocurrency legitimacy and acceptance<br>- Regulatory environment may become clearer<br><br>We recommend investors pay attention to the follow-up developments of this news and its impact on the market.<br><br><a href="#">View Details</a></div>
+                        </div>
+                        <div class="message-time">2025-04-14 16:45:20</div>
+                    </div>
+
+                    <!-- 後續內容將繼續分段翻譯填入 -->
+                </div>
+
+                <div class="no-results hidden">No messages found matching your criteria</div>
+
+                <div class="pagination" id="pagination">
+                    <div class="pagination-item pagination-prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        Previous
+                    </div>
+                    <div class="pagination-item active">1</div>
+                    <div class="pagination-item">2</div>
+                    <div class="pagination-item">3</div>
+                    <div class="pagination-item">4</div>
+                    <div class="pagination-item pagination-next">
+                        Next
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 分頁設置
+            const messagesPerPage = 10;
+            let currentPage = 1;
+            let totalPages = 1;
+            let filteredItems = [];
+            
+            // 標籤切換
+            const categoryItems = document.querySelectorAll('.category-item');
+            const messageItems = document.querySelectorAll('.message-item');
+            const noResults = document.querySelector('.no-results');
+            const paginationContainer = document.getElementById('pagination');
+            const viewButtons = document.querySelectorAll('.view-toggle-button');
+
+            // 初始化頁面動畫
+            animateContent();
+
+            // 添加淡入動畫
+            function animateContent() {
+                document.querySelectorAll('.message-item:not(.hidden)').forEach((item, index) => {
+                    setTimeout(() => {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(15px)';
+                        item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 50);
+                    }, index * 50);
+                });
+            }
+
+            // 初始化分頁
+            function initPagination() {
+                // 計算總頁數
+                filteredItems = Array.from(messageItems).filter(item => !item.classList.contains('hidden'));
+                totalPages = Math.ceil(filteredItems.length / messagesPerPage);
+                
+                console.log(`Pagination initialized: Total items=${filteredItems.length}, Total pages=${totalPages}`);
+                
+                // 更新分頁UI
+                updatePaginationUI();
+                
+                // 顯示當前頁的內容
+                showCurrentPage();
+            }
+            
+            // 更新分頁UI
+            function updatePaginationUI() {
+                // 清空分頁容器
+                paginationContainer.innerHTML = '';
+                
+                // 如果沒有消息或只有一頁，隱藏分頁
+                if (filteredItems.length === 0 || totalPages <= 1) {
+                    paginationContainer.style.display = 'none';
+                    return;
+                }
+                
+                paginationContainer.style.display = 'flex';
+                
+                // 添加上一頁按鈕
+                const prevButton = document.createElement('div');
+                prevButton.className = 'pagination-item pagination-prev' + (currentPage === 1 ? ' disabled' : '');
+                prevButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Previous
+                `;
+                prevButton.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updatePaginationUI();
+                        showCurrentPage();
+                        animateContent();
+                    }
+                });
+                paginationContainer.appendChild(prevButton);
+                
+                // 計算顯示的頁碼範圍
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+                
+                // 添加頁碼按鈕
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageItem = document.createElement('div');
+                    pageItem.className = 'pagination-item' + (i === currentPage ? ' active' : '');
+                    pageItem.textContent = i;
+                    pageItem.addEventListener('click', function() {
+                        if (currentPage !== i) {
+                            currentPage = i;
+                            updatePaginationUI();
+                            showCurrentPage();
+                            animateContent();
+                        }
+                    });
+                    paginationContainer.appendChild(pageItem);
+                }
+                
+                // 添加下一頁按鈕
+                const nextButton = document.createElement('div');
+                nextButton.className = 'pagination-item pagination-next' + (currentPage === totalPages ? ' disabled' : '');
+                nextButton.innerHTML = `
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                `;
+                nextButton.addEventListener('click', function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updatePaginationUI();
+                        showCurrentPage();
+                        animateContent();
+                    }
+                });
+                paginationContainer.appendChild(nextButton);
+            }
+            
+            // 顯示當前頁的內容
+            function showCurrentPage() {
+                const start = (currentPage - 1) * messagesPerPage;
+                const end = start + messagesPerPage;
+                
+                console.log(`Showing page: Current page=${currentPage}, Start item=${start}, End item=${end}, Total items=${filteredItems.length}`);
+                
+                // 先隱藏所有消息
+                messageItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                // 顯示當前頁的消息
+                for (let i = start; i < end && i < filteredItems.length; i++) {
+                    filteredItems[i].style.display = 'flex';
+                    filteredItems[i].style.opacity = '0';
+                    filteredItems[i].style.transform = 'translateY(10px)';
+                    
+                    // 使用延遲創建階梯式出現效果
+                    setTimeout(() => {
+                        filteredItems[i].style.opacity = '1';
+                        filteredItems[i].style.transform = 'translateY(0)';
+                    }, (i - start) * 50);
+                }
+                
+                // 如果沒有項目顯示，顯示無結果信息
+                if (filteredItems.length === 0) {
+                    noResults.classList.remove('hidden');
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.classList.add('hidden');
+                    noResults.style.display = 'none';
+                }
+                
+                // 平滑滾動到頁面頂部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // 分類項點擊事件
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 如果已經是激活狀態，不做任何操作
+                    if (this.classList.contains('active')) return;
+                    
+                    // 移除其他分類的活躍狀態
+                    categoryItems.forEach(t => t.classList.remove('active'));
+                    // 添加當前分類的活躍狀態
+                    this.classList.add('active');
+                    
+                    const type = this.getAttribute('data-type');
+                    console.log(`Category clicked: ${type}`);
+                    
+                    // 重置所有項目的顯示狀態，讓過濾器正確工作
+                    messageItems.forEach(item => {
+                        item.classList.remove('hidden');
+                        item.style.display = '';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    });
+                    
+                    // 過濾消息
+                    filterMessages(type);
+                    
+                    // 重置到第一頁
+                    currentPage = 1;
+                    
+                    // 初始化分頁
+                    initPagination();
+                    
+                    // 添加動畫效果
+                    animateContent();
+                });
+            });
+
+            // 視圖切換
+            const viewToggle = document.querySelector('.view-toggle');
+            if (viewToggle) {
+                viewToggle.style.display = 'none';
+            }
+
+            // 搜尋功能加入防抖動
+            const searchBox = document.querySelector('.search-box');
+            let searchTimeout;
+            
+            searchBox.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    const activeType = document.querySelector('.category-item.active').getAttribute('data-type');
+                    console.log(`Search: term=${searchTerm}, current category=${activeType}`);
+                    
+                    // 重置所有項目的顯示狀態，讓過濾器正確工作
+                    messageItems.forEach(item => {
+                        item.classList.remove('hidden');
+                        item.style.display = '';
+                    });
+                    
+                    // 過濾消息
+                    filterMessages(activeType, searchTerm);
+                    
+                    // 重置到第一頁
+                    currentPage = 1;
+                    
+                    // 初始化分頁
+                    initPagination();
+                    
+                    // 添加動畫效果
+                    animateContent();
+                }, 300); // 300ms 防抖動
+            });
+
+            // 過濾消息函數
+            function filterMessages(type, searchTerm = '') {
+                let visibleCount = 0;
+                
+                messageItems.forEach(item => {
+                    const messageType = item.getAttribute('data-type');
+                    const messageContent = item.querySelector('.message-text').textContent.toLowerCase();
+                    const messageTitle = item.querySelector('.message-title').textContent.toLowerCase();
+                    const messageSubtitle = item.querySelector('.message-subtitle').textContent.toLowerCase();
+                    
+                    const matchesType = type === 'all' || messageType === type;
+                    const matchesSearch = !searchTerm || 
+                                          messageContent.includes(searchTerm) || 
+                                          messageTitle.includes(searchTerm) ||
+                                          messageSubtitle.includes(searchTerm);
+                    
+                    if (matchesType && matchesSearch) {
+                        item.classList.remove('hidden');
+                        item.style.display = ''; // 重置display屬性，讓分頁功能處理顯示
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                        item.style.display = 'none';
+                    }
+                });
+                
+                if (visibleCount === 0) {
+                    noResults.classList.remove('hidden');
+                    noResults.style.display = 'block';
+                    paginationContainer.style.display = 'none';
+                } else {
+                    noResults.classList.add('hidden');
+                    noResults.style.display = 'none';
+                }
+
+                console.log(`Filter result: type=${type}, search term=${searchTerm}, visible items=${visibleCount}`);
+                return visibleCount;
+            }
+
+            // 批量標記已讀
+            const markAllReadBtn = document.querySelector('.mark-all-read-btn');
+            markAllReadBtn.addEventListener('click', function() {
+                // 找出所有未讀消息，不受篩選或分頁限制
+                const allUnreadMessages = document.querySelectorAll('.message-item:not(.read)');
+                
+                // 立即標記所有消息為已讀，不使用動畫延遲
+                allUnreadMessages.forEach(msg => {
+                    msg.classList.add('read');
+                });
+                
+                // 立即更新未讀計數
+                updateUnreadCounts();
+                
+                // 然後再添加視覺效果
+                allUnreadMessages.forEach((msg, index) => {
+                    setTimeout(() => {
+                        // 添加閃爍效果
+                        msg.style.backgroundColor = 'rgba(103, 58, 183, 0.08)';
+                        setTimeout(() => {
+                            msg.style.backgroundColor = '';
+                        }, 300);
+                    }, index * 50);
+                });
+                
+                // 添加成功提示
+                if (allUnreadMessages.length > 0) {
+                    showToast(`Marked ${allUnreadMessages.length} messages as read`);
+                }
+            });
+
+            // 顯示提示框
+            function showToast(message) {
+                let toastContainer = document.querySelector('.toast-container');
+                
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container';
+                    document.body.appendChild(toastContainer);
+                }
+                
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    ${message}
+                `;
+                toastContainer.appendChild(toast);
+                
+                // 顯示提示
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                
+                // 3秒後移除提示
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toastContainer.removeChild(toast);
+                    }, 300);
+                }, 3000);
+            }
+
+            // 更新分類未讀數量
+            function updateUnreadCounts() {
+                const categories = {
+                    'all': 0,
+                    'system': 0,
+                    'trade': 0,
+                    'security': 0,
+                    'activity': 0,
+                    'market': 0
+                };
+                
+                // 計算每個分類的未讀數量
+                messageItems.forEach(item => {
+                    if (!item.classList.contains('read')) {
+                        const type = item.getAttribute('data-type');
+                        categories[type]++;
+                        categories['all']++;
+                    }
+                });
+                
+                // 更新分類標籤上的未讀數量
+                categoryItems.forEach(item => {
+                    const type = item.getAttribute('data-type');
+                    const countElement = item.querySelector('.unread-count');
+                    
+                    if (categories[type] > 0) {
+                        countElement.textContent = categories[type];
+                        countElement.style.display = 'flex';
+                    } else {
+                        countElement.style.display = 'none';
+                    }
+                });
+                
+                // 更新頂部通知圖標的未讀數量
+                const notificationBadge = document.querySelector('.notification-badge');
+                if (categories['all'] > 0) {
+                    notificationBadge.textContent = categories['all'];
+                    notificationBadge.style.display = 'flex';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            }
+
+            // 設置頁面跳轉
+            const settingsLink = document.querySelector('.settings-link');
+            settingsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 添加頁面過渡效果
+                document.body.style.opacity = '0.5';
+                document.body.style.transition = 'opacity 0.3s ease';
+                
+                setTimeout(() => {
+                    window.location.href = 'message_center_settings_en.html';
+                }, 300);
+            });
+
+            // 消息項點擊 - 優化動畫
+            messageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 標記為已讀
+                    if (!this.classList.contains('read')) {
+                        this.classList.add('read');
+                        // 即時更新未讀計數
+                        updateUnreadCounts();
+                    }
+                    
+                    // 先關閉所有已展開的消息項
+                    const expandedItems = document.querySelectorAll('.message-expanded');
+                    expandedItems.forEach(expandedItem => {
+                        if (expandedItem !== this) {
+                            expandedItem.classList.remove('message-expanded');
+                            
+                            // 找到子元素並調整顯示
+                            const subtitle = expandedItem.querySelector('.message-subtitle');
+                            const text = expandedItem.querySelector('.message-text');
+                            
+                            // 淡出消息文本
+                            text.style.opacity = '0';
+                            text.style.transform = 'translateY(-5px)';
+                            
+                            // 淡入副標題
+                            setTimeout(() => {
+                                text.style.display = 'none';
+                                subtitle.style.display = 'block';
+                                subtitle.style.opacity = '0';
+                                
+                                setTimeout(() => {
+                                    subtitle.style.opacity = '1';
+                                }, 50);
+                            }, 150);
+                        }
+                    });
+                    
+                    // 切換當前消息的展開/收起狀態
+                    if (!this.classList.contains('message-expanded')) {
+                        // 展開消息
+                        this.classList.add('message-expanded');
+                        
+                        const subtitle = this.querySelector('.message-subtitle');
+                        const text = this.querySelector('.message-text');
+                        
+                        // 淡出副標題
+                        subtitle.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            subtitle.style.display = 'none';
+                            text.style.display = 'block';
+                            text.style.opacity = '0';
+                            text.style.transform = 'translateY(5px)';
+                            
+                            setTimeout(() => {
+                                text.style.opacity = '1';
+                                text.style.transform = 'translateY(0)';
+                            }, 50);
+                        }, 150);
+                    } else {
+                        // 收起消息
+                        this.classList.remove('message-expanded');
+                        
+                        const subtitle = this.querySelector('.message-subtitle');
+                        const text = this.querySelector('.message-text');
+                        
+                        // 淡出消息文本
+                        text.style.opacity = '0';
+                        text.style.transform = 'translateY(-5px)';
+                        
+                        // 淡入副標題
+                        setTimeout(() => {
+                            text.style.display = 'none';
+                            subtitle.style.display = 'block';
+                            subtitle.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                subtitle.style.opacity = '1';
+                            }, 50);
+                        }, 150);
+                    }
+                    
+                    // 如果是收起狀態，滾動到該消息頂部
+                    if (!this.classList.contains('message-expanded')) {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+            
+            // 通知下拉菜單優化
+            const notificationButton = document.getElementById('notificationButton');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const overlay = document.getElementById('overlay');
+
+            notificationButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationDropdown.classList.toggle('show');
+                overlay.classList.toggle('show');
+                
+                // 添加下拉菜單動畫
+                if (notificationDropdown.classList.contains('show')) {
+                    const items = notificationDropdown.querySelectorAll('.notification-item');
+                    items.forEach((item, index) => {
+                        item.style.opacity = '0';
+                        item.style.transform = 'translateY(10px)';
+                        
+                        setTimeout(() => {
+                            item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateY(0)';
+                        }, 50 + index * 50);
+                    });
+                }
+            });
+
+            overlay.addEventListener('click', function() {
+                notificationDropdown.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+            
+            // 點擊文檔其他地方關閉下拉菜單
+            document.addEventListener('click', function(e) {
+                if (!notificationButton.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove('show');
+                    overlay.classList.remove('show');
+                }
+            });
+
+            // 初始化分類未讀數量
+            updateUnreadCounts();
+
+            // 初始化分頁
+            initPagination();
+            
+            // 添加響應式設計支持
+            window.addEventListener('resize', function() {
+                updatePaginationUI();
+            });
+        });
+    </script>
+</body>
+</html> 
