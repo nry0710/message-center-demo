@@ -278,6 +278,113 @@
         .overlay.show {
             display: block;
         }
+        
+        /* Confirmation Modal */
+        .confirmation-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .confirmation-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .confirmation-modal {
+            background-color: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9) translateY(30px);
+            transition: all 0.3s ease;
+        }
+        
+        .confirmation-modal-overlay.show .confirmation-modal {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        
+        .modal-message {
+            font-size: 15px;
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+        
+        .modal-btn-cancel {
+            background-color: #f8f9fa;
+            color: #666;
+            border: 1px solid #e9ecef;
+        }
+        
+        .modal-btn-cancel:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .modal-btn-confirm {
+            background-color: #673ab7;
+            color: white;
+        }
+        
+        .modal-btn-confirm:hover {
+            background-color: #5e35b1;
+        }
+        
+        .modal-btn:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -408,20 +515,123 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal-overlay" id="confirmationModal">
+        <div class="confirmation-modal">
+            <div class="modal-icon">
+                ⚠️
+            </div>
+            <div class="modal-title">Confirm Settings Changes?</div>
+            <div class="modal-message" id="modalMessage">
+                Are you sure you want to disable these notifications? You may miss important updates and alerts that could affect your account security and trading activities.
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" id="modalCancel">Review Settings</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Switch toggle events
+            const switches = document.querySelectorAll('.switch input');
+            
+            switches.forEach(switchInput => {
+                switchInput.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    const settingName = this.closest('.settings-item').querySelector('.item-label').textContent;
+                    
+                    // Simply log the change, no immediate confirmation needed
+                    console.log(isChecked ? 'Enabled' : 'Disabled', settingName);
+                });
+            });
+            
+            // Check if a notification type is considered important
+            function isImportantNotification(settingName) {
+                const importantTypes = ['System Notifications', 'Trading Related', 'Security Alerts'];
+                return importantTypes.includes(settingName);
+            }
+            
+            // Get disabled important notification types
+            function getDisabledImportantTypes() {
+                const disabledTypes = [];
+                const switches = document.querySelectorAll('.switch input');
+                
+                switches.forEach(switchInput => {
+                    const settingName = switchInput.closest('.settings-item').querySelector('.item-label').textContent;
+                    if (!switchInput.checked && isImportantNotification(settingName)) {
+                        disabledTypes.push(settingName);
+                    }
+                });
+                
+                return disabledTypes;
+            }
+            
+            // Show confirmation modal for disabled types
+            function showSaveConfirmationModal(disabledTypes) {
+                const modal = document.getElementById('confirmationModal');
+                const messageElement = document.getElementById('modalMessage');
+                
+                let message = '';
+                if (disabledTypes.length === 1) {
+                    message = `Are you sure you want to disable ${disabledTypes[0]}? You may miss important alerts and updates that could affect your account security and trading activities.`;
+                } else if (disabledTypes.length === 2) {
+                    message = `Are you sure you want to disable ${disabledTypes[0]} and ${disabledTypes[1]}? You may miss important alerts and updates that could affect your account security and trading activities.`;
+                } else if (disabledTypes.length > 2) {
+                    const lastType = disabledTypes.pop();
+                    message = `Are you sure you want to disable ${disabledTypes.join(', ')}, and ${lastType}? You may miss important alerts and updates that could affect your account security and trading activities.`;
+                }
+                
+                messageElement.textContent = message;
+                modal.classList.add('show');
+                
+                return true; // Indicate that confirmation is needed
+            }
+            
+            // Hide confirmation modal
+            function hideConfirmationModal() {
+                const modal = document.getElementById('confirmationModal');
+                modal.classList.remove('show');
+            }
+            
+            // Save all settings without confirmation
+            function saveSettingsDirectly() {
+                alert('Settings saved successfully');
+            }
+            
             // Save button click event
             const saveButton = document.querySelector('.save-button');
             saveButton.addEventListener('click', function() {
-                alert('Settings saved successfully');
+                // Check if any important notification types are disabled
+                const disabledImportantTypes = getDisabledImportantTypes();
+                
+                if (disabledImportantTypes.length > 0) {
+                    // Show confirmation modal for disabled important types
+                    showSaveConfirmationModal(disabledImportantTypes);
+                } else {
+                    // No important types disabled, save directly
+                    saveSettingsDirectly();
+                }
             });
             
-            // Switch toggle events
-            const switches = document.querySelectorAll('.switch input');
-            switches.forEach(switchInput => {
-                switchInput.addEventListener('change', function() {
-                    console.log(this.checked ? 'Enabled' : 'Disabled', this.closest('.settings-item').querySelector('.item-label').textContent);
-                });
+            // Modal event listeners
+            document.getElementById('modalCancel').addEventListener('click', function() {
+                // User chose to keep notifications enabled, hide modal
+                hideConfirmationModal();
+            });
+            
+            document.getElementById('modalConfirm').addEventListener('click', function() {
+                // User confirmed to save with disabled notifications
+                hideConfirmationModal();
+                saveSettingsDirectly();
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('confirmationModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideConfirmationModal();
+                }
             });
             
             // Notification dropdown
